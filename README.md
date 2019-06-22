@@ -26,18 +26,19 @@ The following are required :
 - slidingwindow
   - https://github.com/adamrehn/slidingwindow
 
-### Cloning & installing dependencies
+### Compiling Locally
 
 ```bash
-$ git clone https://github.com/SyBorg91/pose-estimation-detection
-$ cd pose-estimation-detection
-$ pip3 install -r requirements.txt
+$ git clone https://github.com/dronefreak/human-action-classification.git
+$ cd phuman-action-classification
+$ sudo -H pip3 install -r requirements.txt
 ```
+Please check the dependency tree before executing the `pip` install command.
 
-### Pose Estimation with realtime webcam feed
+### Pose Estimation and Action Classification on a Single Image
 
 ```
-$ python run_webcam.py --model=mobilenet_thin --resize=432x368 --camera=0
+$ python3 run_image.py --image=1.jpg
 ```
 
 Run the above command to start pose estimation with the onboard webcam.
