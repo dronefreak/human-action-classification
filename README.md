@@ -10,10 +10,11 @@ The model is able to estimate the human poses as well as classify the current po
 
  **FPS & estimation/detection varies with the CPU/GPU power.**
  
-### Testing Ouput for a Single Image
+### Testing Ouputs for a Single Image
 
 ![alt text](show.png)
 
+![alt text](show1.png)
 ### Dependencies
 
 The following are required :
