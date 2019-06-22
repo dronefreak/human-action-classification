@@ -2,13 +2,13 @@
 
 Pose estimation & detection has been minimally implemented using the OpenPose implementation https://github.com/ildoonet/tf-pose-estimation with Tensorflow. For the binary classification of poses, namely the classes : sitting or standing, the model used, MobileNet (a CNN originally trained on the ImageNet Large Visual Recognition Challenge dataset), was retrained (final layer) on a dataset of ~1500 images of poses.
 
-The model is able to estimate the human poses as well as classify the current pose to a fairly good degree of accuracy.
+Pose classification accuracy is 94.56% and scene recognition rate is 92.3%. 
 
 ### Demo
 
 **An alternative for improving the model along with deep learning is to include heuristics, in the form of calculation of the skeletal points’ relative distances from each other.**
 
- **FPS & estimation/detection varies with the CPU/GPU power.**
+ **FPS varies with the CPU/GPU power available on the local machine.**
  
 ### Testing Ouputs for a Single Image
 
@@ -30,7 +30,7 @@ The following are required :
 
 ```bash
 $ git clone https://github.com/dronefreak/human-action-classification.git
-$ cd phuman-action-classification
+$ cd human-action-classification
 $ sudo -H pip3 install -r requirements.txt
 ```
 Please check the dependency tree before executing the `pip` install command.
