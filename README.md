@@ -10,13 +10,9 @@ The model is able to estimate the human poses as well as classify the current po
 
  **FPS & estimation/detection varies with the CPU/GPU power.**
  
-### Training Examples
+### Testing Ouput for a Single Image
 
-- For sitting pose
-![alt text](/images/sitting.jpeg)
-
-- For standing pose
-![alt text](/images/standing.jpeg)
+![alt text](show.png)
 
 ### Dependencies
 
