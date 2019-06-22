@@ -41,21 +41,9 @@ Please check the dependency tree before executing the `pip` install command.
 $ python3 run_image.py --image=1.jpg
 ```
 
-Run the above command to start pose estimation with the onboard webcam.
+Also, please do not forget to change the `address` variable in the code according to your local machine.
 
 ## References
-
-### OpenPose
-
-[1] https://github.com/CMU-Perceptual-Computing-Lab/openpose
-
-[2] Training Codes : https://github.com/ZheC/Realtime_Multi-Person_Pose_Estimation
-
-[3] Custom Caffe by Openpose : https://github.com/CMU-Perceptual-Computing-Lab/caffe_train
-
-[4] Keras Openpose : https://github.com/michalfaber/keras_Realtime_Multi-Person_Pose_Estimation
-
-[5] Keras Openpose2 : https://github.com/kevinlin311tw/keras-openpose-reproduce
 
 ### Lifting from the deep
 
@@ -69,7 +57,6 @@ Run the above command to start pose estimation with the onboard webcam.
 
 [2] Pretrained model (Pose estimation) : https://github.com/tensorflow/models/blob/master/slim/nets/mobilenet_v1.md
 
-[3] Retrained model (Pose detection) : https://codelabs.developers.google.com/codelabs/tensorflow-for-poets/
 
 ### Libraries
 
