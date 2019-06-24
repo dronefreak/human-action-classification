@@ -4,10 +4,6 @@ Pose estimation & detection has been minimally implemented using the OpenPose im
 For classifying scenes around the person in consideration, we retrain Inception-v3 architecture on the Stanford 40 dataset (9523 images), which incorporates 40 different day-to-day activites. 
 
 Pose classification accuracy is 94.56% and scene recognition rate is 92.3%. 
-
-### Demo
-
-**An alternative for improving the model along with deep learning is to include heuristics, in the form of calculation of the skeletal points’ relative distances from each other.**
  
 ### Testing Ouputs for a Single Image
 
