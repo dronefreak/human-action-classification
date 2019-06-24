@@ -88,7 +88,7 @@ HEIGHT = 100
 LR = 1e-4
 EPOCHS = 20
 BATCH_SIZE = 10
-MODEL_NAME = 'human-actions-{}-{}-LR-{}.model'.format('lrcn_1',LR,FILE_I_END)
+MODEL_NAME = 'human-actions-{}-{}-LR-{}.model'.format('inception',LR,FILE_I_END)
 model = incp(WIDTH, HEIGHT, 3, LR, output=40, model_name=MODEL_NAME)
 #Init train_data
 X = np.array([i[1] for i in train_data]).reshape(-1,WIDTH,HEIGHT,3)
