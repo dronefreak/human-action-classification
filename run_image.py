@@ -60,8 +60,8 @@ if __name__ == '__main__':
 				(10, 30),  cv2.FONT_HERSHEY_SIMPLEX, 0.5,
 				(0, 0, 255), 2)
 	print('\n Overall Evaluation time (1-image): {:.3f}s\n'.format(end_time-start_time))
-	cv2.imwrite('show.png',img)
-	cv2.imshow('tf-pose-estimation result', img)
+	cv2.imwrite('show1.png',img)
+	cv2.imshow('tf-human-action-classification result', img)
 	cv2.waitKey(0)
 	logger.debug('+finished+')
 	cv2.destroyAllWindows()
