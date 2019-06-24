@@ -75,7 +75,24 @@ Once the dataset is collected, we commence training by issuing the following com
 python3 scripts/retrain.py --model_dir=tf_files/retrained_graph.pb --output_labels=tf_files/retrained_labels.txt --image_dir=training/
 ```
 Please note that there are multiple options available for this python script, like learning rate, default directories, training steps etc. Please check the code itself for exploring further, and modify them as per your requirements.
-The trained models are usually saved in /tmp, in Ubuntu 18.04
+The trained models are usually saved in /tmp, in Ubuntu 18.04.
+
+Check `inception_from_scratch.py` if you want to train the architecture from scratch and not used pre-trained networks. It is defined as a function and hence can be called from any `.py` script. You could try the following commands to achieve this:
+
+```
+#Import other libraries as per requirements
+from inception_from_scratch import inceptionv3 as incp
+
+WIDTH = 100
+HEIGHT = 100
+LR = 1e-4
+EPOCHS = 20
+BATCH_SIZE = 10
+MODEL_NAME = 'human-actions-{}-{}-LR-{}.model'.format('lrcn_1',LR,FILE_I_END)
+model = incp(WIDTH, HEIGHT, 1, LR, output=40, model_name=MODEL_NAME)
+model.fit(X,Y,20, batch_size = 5)
+model.save(MODEL_NAME)
+```
 
 ## References
 
