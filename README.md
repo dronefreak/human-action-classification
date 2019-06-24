@@ -70,8 +70,8 @@ Once the dataset is collected, we commence training by issuing the following com
 ```
 python3 scripts/retrain.py --model_dir=tf_files/retrained_graph.pb --output_labels=tf_files/retrained_labels.txt --image_dir=training/
 ```
-Please note that there are multiple options available for this python script, like learning rate, default directories, training steps etc. Please check the code itself for exploring further, and modify them as per your requirements.
-The trained models are usually saved in /tmp, in Ubuntu 18.04.
+Please note that there are multiple options available for this python script, like learning rate, default directories, training steps etc. Please check the code itself for exploring further, and modify them as per your requirements. You ccan also choose the type of architecture you want to retrain.
+The trained models are default saved in /tmp, in Ubuntu 18.04.
 
 Check `inception_from_scratch.py` if you want to train the architecture from scratch and not used pre-trained networks. It is defined as a function and hence can be called from any `.py` script. You could try the following commands to achieve this:
 
