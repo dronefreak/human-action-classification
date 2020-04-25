@@ -25,7 +25,6 @@ The following are required :
 ```bash
 $ git clone https://github.com/dronefreak/human-action-classification.git
 $ cd human-action-classification
-$ sudo -H pip3 install -r requirements.txt
 ```
 Please check the dependency tree before executing the `pip` install command.
 
