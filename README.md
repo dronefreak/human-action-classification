@@ -52,8 +52,7 @@ There are two classifications tasks happening in this project. One is pose and t
 
 ```
 training
-│   README.md
-│   file001.txt    
+│   README.md   
 │
 └───Action-1
 │   │   file011.jpg
