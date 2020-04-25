@@ -91,6 +91,14 @@ model.fit(X,Y,20, batch_size = 5)
 model.save(MODEL_NAME)
 ```
 
+If you receive an error saying something like `No module named '_pafprocess' you need to build c++ library for pafprocess.`
+please follow these steps to resolve them:
+```
+$ cd tf_pose/pafprocess/
+$ swig -python -c++ pafprocess.i 
+$ python setup.py build_ext --inplace
+```
+
 ## References
 
 ### Lifting from the deep
