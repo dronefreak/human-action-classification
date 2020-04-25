@@ -1,7 +1,7 @@
 import argparse
 import logging
 import time
-
+import os
 import cv2
 import numpy as np
 
@@ -19,7 +19,7 @@ ch.setFormatter(formatter)
 logger.addHandler(ch)
 
 fps_time = 0
-address = '/home/caffemodel/coursework/CVPR/pose-estimation-detection/'
+address = os.getcwd()
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='tf-human-action-classification')
 	parser.add_argument('--image', type=str, required=True)
@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
 	logger.debug('initialization %s : %s' % ('mobilenet_thin', get_graph_path('mobilenet_thin')))
 	e = TfPoseEstimator(get_graph_path('mobilenet_thin'), target_size=(432, 368))
-	image = cv2.imread(address+args.image)
+	image = cv2.imread(args.image)
 	logger.info('cam image=%dx%d' % (image.shape[1], image.shape[0]))
 
 	# count = 0
@@ -48,7 +48,7 @@ if __name__ == '__main__':
 	
 	# Classification
 	pose_class = label_img.classify(image)
-	scene_class = label_img_scene.classify(address+args.image)
+	scene_class = label_img_scene.classify(args.image)
 	end_time = time.time()
 	logger.debug('+displaying+')
 	cv2.putText(img,
