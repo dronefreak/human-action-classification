@@ -1,0 +1,45 @@
+#!/bin/bash
+
+usage()
+{
+    echo "usage: ./configure [options]"
+    echo "options:"
+    echo "  --miniconda_folder: path to the miniconda3 folder to be used (optional, miniconda3 by default)"
+    echo "  --miniconda_pkgs_cache: path to the miniconda3 folder to be used (optional, none used by default)"
+    echo "  --non_editable_mode: install all python packages in non-editable mode (optional)"
+}
+
+MINICONDA_FOLDER="miniconda3"
+MINICONDA_PKGS_CACHE=""
+EDITABLE_MODE=""
+
+while [ "$1" != "" ]; do
+    case $1 in
+        -m | --miniconda_folder )           
+            shift
+            MINICONDA_FOLDER="$1"
+            ;;
+        --miniconda_pkgs_cache )           
+            shift
+            MINICONDA_PKGS_CACHE="$1"
+            ;;
+        --non_editable_mode )
+            EDITABLE_MODE="--non_editable_mode"
+            ;;
+        -h | --help )
+            usage
+            exit
+            ;;
+        * )                     
+            usage
+            exit 1
+            ;;
+    esac
+    shift
+done
+
+echo "MINICONDA_FOLDER = $MINICONDA_FOLDER" >Makefile
+echo "MINICONDA_PKGS_CACHE = $MINICONDA_PKGS_CACHE" >>Makefile
+echo "EDITABLE_MODE = $EDITABLE_MODE" >>Makefile
+cat dev_tools/Makefile.in >>Makefile
+echo "Configuration completed, type make to install the project."

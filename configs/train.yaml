@@ -1,0 +1,62 @@
+defaults: # these are the sub-config files for specific details
+  - dataloader: cityscapes
+  - _self_ # this makes the top-level config take priority over sub-configs, see https://hydra.cc/docs/upgrades/1.0_to_1.1/default_composition_order/
+
+general:
+  experiment_tag: "???"
+  output_dir: "???"
+  learning_rate: 1e-3
+  batch_size: 4
+  num_epochs: 100
+  seed: 0
+  multi_gpu_training: false
+
+model:
+  input_shape: [1024, 1024, 3]
+  num_classes: 19
+  backbone: resnet16
+  use_transpose_conv: false
+
+class_names:
+  {
+    "applauding": 0,
+    "blowing_bubbles": 1,
+    "brushing_teeth": 2,
+    "cleaning_the_floor": 3,
+    "climbing": 4,
+    "cooking": 5,
+    "cutting_trees": 6,
+    "cutting_vegetables": 7,
+    "drinking": 8,
+    "feeding_a_horse": 9,
+    "fishing": 10,
+    "fixing_a_bike": 11,
+    "fixing_a_car": 12,
+    "gardening": 13,
+    "holding_an_umbrella": 14,
+    "jumping": 15,
+    "looking_through_a_microscope": 16,
+    "looking_through_a_telescope": 17,
+    "phoning": 18,
+    "playing_guitar": 19,
+    "playing_violin": 20,
+    "pouring_liquid": 21,
+    "pushing_a_cart": 22,
+    "reading": 23,
+    "riding_a_bike": 24,
+    "riding_a_horse": 25,
+    "rowing_a_boat": 26,
+    "running": 27,
+    "shooting_an_arrow": 28,
+    "smoking": 29,
+    "taking_photos": 30,
+    "texting_message": 31,
+    "throwing_frisby": 32,
+    "using_a_computer": 33,
+    "walking_the_dog": 34,
+    "washing_dishes": 35,
+    "watching_TV": 36,
+    "waving_hands": 37,
+    "writing_on_a_board": 38,
+    "writing_on_a_book": 39,
+  }
