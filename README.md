@@ -1,3 +1,5 @@
+# Update coming soon with TensorFlow 2!
+
 # Human Action Classification
 
 Pose estimation & detection has been minimally implemented using the OpenPose implementation https://github.com/ildoonet/tf-pose-estimation with Tensorflow. For binary classification of poses, (sitting or upright), MobileNet (a CNN originally trained on the ImageNet Large Visual Recognition Challenge dataset), was retrained (final layer) on a dataset of ~1500 images of poses.
