@@ -1,5 +1,4 @@
 defaults: # these are the sub-config files for specific details
-  - dataloader: cityscapes
   - _self_ # this makes the top-level config take priority over sub-configs, see https://hydra.cc/docs/upgrades/1.0_to_1.1/default_composition_order/
 
 general:
@@ -10,6 +9,8 @@ general:
   num_epochs: 100
   seed: 0
   multi_gpu_training: false
+  image_splits_path: /data/saumya/Datasets/Stanford40/ImageSplits
+  train_val_split_ratio: 0.9
 
 model:
   input_shape: [1024, 1024, 3]
