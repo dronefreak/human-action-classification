@@ -45,7 +45,7 @@ def split_train_val(config: DictConfig):
     global_train_split = []
     global_val_split = []
     for class_name, index in track(
-        config.class_names.items(), description="Analyzing..."
+        config.class_names.items(), transient=False, description="Analyzing..."
     ):
         sample = base_path / f"{class_name}_train.txt"
 
@@ -64,6 +64,15 @@ def split_train_val(config: DictConfig):
                 global_train_split.append(item)
             else:
                 global_val_split.append(item)
+
+        with open(base_path / "global_train.txt", "w") as f:
+            for line in global_train_split:
+                f.write(line)
+                f.write("\n")
+        with open(base_path / "global_val.txt", "w") as f:
+            for line in global_val_split:
+                f.write(line)
+                f.write("\n")
 
 
 if __name__ == "__main__":
