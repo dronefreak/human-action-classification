@@ -34,11 +34,14 @@ import tensorflow as tf
 
 
 def get_list_of_callbacks(
-    *, logdir: Path, monitor_metric: str = "val_loss", mode: str = "min"
+    *,
+    logdir: Path,
+    monitor_metric: str = "val_sparse_categorical_accuracy",
+    mode: str = "max"
 ) -> list:
     callbacks_list = []
     reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
-        monitor=monitor_metric, factor=0.5, patience=10, min_lr=1e-6
+        monitor=monitor_metric, factor=0.9, patience=50, min_lr=1e-6
     )
     callbacks_list.append(reduce_lr)
     tensorboard = tf.keras.callbacks.TensorBoard(
@@ -53,7 +56,7 @@ def get_list_of_callbacks(
     )
     callbacks_list.append(tensorboard)
     save_every_nth_epoch = keras.callbacks.ModelCheckpoint(
-        logdir / "{epoch:02d}.weights.h5",
+        logdir / "last.weights.h5",
         monitor=monitor_metric,
         verbose=1,
         save_best_only=False,

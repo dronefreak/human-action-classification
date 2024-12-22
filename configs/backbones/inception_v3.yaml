@@ -1,0 +1,9 @@
+inception_v3:
+  _target_: tensorflow.keras.applications.InceptionV3
+  include_top: false
+  weights: imagenet
+  input_tensor: null
+  input_shape: null
+  pooling: null
+  classes: 1000
+  classifier_activation: softmax

@@ -1,0 +1,25 @@
+sparse_categorical_accuracy:
+  _target_: tensorflow.keras.metrics.SparseCategoricalAccuracy
+  name: accuracy
+
+precision:
+  _target_: tensorflow.keras.metrics.Precision
+  thresholds: null
+  top_k: null
+  class_id: null
+  name: null
+  dtype: null
+
+recall:
+  _target_: tensorflow.keras.metrics.Recall
+  thresholds: null
+  top_k: null
+  class_id: null
+  name: null
+  dtype: null
+
+f1_score:
+  _target_: tensorflow.keras.metrics.F1Score
+  average: macro
+  threshold: null
+  dtype: null

@@ -1,0 +1,6 @@
+sparse_categorical_crossentropy:
+  _target_: tensorflow.keras.losses.SparseCategoricalCrossentropy
+  from_logits: false
+  ignore_class: null
+  reduction: sum_over_batch_size
+  name: sparse_categorical_crossentropy
