@@ -60,6 +60,7 @@ def training_pipeline(config: DictConfig):
         image_splits_path=Path(config.general.image_splits_path),
         class_names_dict=config.class_names,
         input_shape=config.dataloader.input_shape,
+        normalize=config.dataloader.normalize,
         mode="train",
     )
     train_generator = dl_train.get_batched_dataset(config.general.batch_size)
@@ -69,6 +70,7 @@ def training_pipeline(config: DictConfig):
         image_splits_path=Path(config.general.image_splits_path),
         class_names_dict=config.class_names,
         input_shape=config.dataloader.input_shape,
+        normalize=config.dataloader.normalize,
         mode="val",
     )
     val_generator = dl_val.get_batched_dataset(config.general.batch_size)
@@ -78,7 +80,14 @@ def training_pipeline(config: DictConfig):
             Path(config.general.output_dir) / config.general.experiment_name
         )
         Path.mkdir(experiment_path, exist_ok=True, parents=True)
-    callbacks = get_list_of_callbacks(logdir=experiment_path)
+    callbacks = get_list_of_callbacks(
+        logdir=experiment_path,
+        monitor_metric=config.callbacks.monitor_metric,
+        mode=config.callbacks.mode,
+        lr_reduction_factor=config.callbacks.lr_reduction_factor,
+        patience=config.callbacks.patience,
+        min_lr=config.callbacks.min_lr,
+    )
 
     def create_model():
         base_model = hydra.utils.instantiate(config.backbones.backbone)

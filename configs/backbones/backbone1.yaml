@@ -1,4 +1,4 @@
-mnv3:
+backbone:
   _target_: tensorflow.keras.applications.MobileNetV3Large
   input_shape: null
   alpha: 1.0
@@ -11,13 +11,3 @@ mnv3:
   dropout_rate: 0.2
   classifier_activation: softmax
   include_preprocessing: true
-
-backbone:
-  _target_: tensorflow.keras.applications.InceptionV3
-  include_top: false
-  weights: imagenet
-  input_tensor: null
-  input_shape: null
-  pooling: null
-  classes: 1000
-  classifier_activation: softmax

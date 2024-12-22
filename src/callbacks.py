@@ -36,12 +36,18 @@ import tensorflow as tf
 def get_list_of_callbacks(
     *,
     logdir: Path,
-    monitor_metric: str = "val_sparse_categorical_accuracy",
-    mode: str = "max"
+    monitor_metric: str = "val_accuracy",
+    mode: str = "max",
+    lr_reduction_factor: float = 0.9,
+    patience: int = 50,
+    min_lr: float = 1e-6,
 ) -> list:
     callbacks_list = []
     reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
-        monitor=monitor_metric, factor=0.9, patience=50, min_lr=1e-6
+        monitor=monitor_metric,
+        factor=lr_reduction_factor,
+        patience=patience,
+        min_lr=min_lr,
     )
     callbacks_list.append(reduce_lr)
     tensorboard = tf.keras.callbacks.TensorBoard(

@@ -18,6 +18,14 @@ general:
 dataloader:
   input_shape: [400, 400, 3]
   num_classes: 40
+  normalize: false
+
+callbacks:
+  monitor_metric: val_accuracy
+  mode: max
+  lr_reduction_factor: 0.9
+  patience: 50
+  min_lr: 1e-6
 
 class_names:
   {
