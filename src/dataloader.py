@@ -57,7 +57,11 @@ class Dataloader:
         self.mode = mode
         self.dataset_path = dataset_path
         self.input_shape = input_shape
-        self.filepath = image_splits_path / f"global_{self.mode}.txt"
+        self.filepath = (
+            image_splits_path / f"global_{self.mode}.txt"
+            if self.mode in ["train", "val"]
+            else image_splits_path / f"{self.mode}.txt"
+        )
         self.console = get_rich_console()
         self.files_path_list, self.gt_labels = self._locate_dataset_files()
         self.debug = debug

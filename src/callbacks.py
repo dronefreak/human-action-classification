@@ -39,17 +39,30 @@ def get_list_of_callbacks(
     monitor_metric: str = "val_accuracy",
     mode: str = "max",
     lr_reduction_factor: float = 0.9,
-    patience: int = 50,
+    lr_reduction_patience: int = 50,
+    early_stopping_patience: int = 25,
+    min_delta: float = 0.0,
     min_lr: float = 1e-6,
 ) -> list:
     callbacks_list = []
     reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(
         monitor=monitor_metric,
         factor=lr_reduction_factor,
-        patience=patience,
+        patience=lr_reduction_patience,
         min_lr=min_lr,
     )
     callbacks_list.append(reduce_lr)
+    early_stopping = tf.keras.callbacks.EarlyStopping(
+        monitor=monitor_metric,
+        min_delta=min_delta,
+        patience=early_stopping_patience,
+        verbose=0,
+        mode=mode,
+        baseline=None,
+        restore_best_weights=False,
+        start_from_epoch=0,
+    )
+    callbacks_list.append(early_stopping)
     tensorboard = tf.keras.callbacks.TensorBoard(
         log_dir=logdir,
         histogram_freq=0,

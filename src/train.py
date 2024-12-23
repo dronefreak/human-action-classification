@@ -75,6 +75,16 @@ def training_pipeline(config: DictConfig):
     )
     val_generator = dl_val.get_batched_dataset(config.general.batch_size)
 
+    dl_test = Dataloader(
+        dataset_path=Path(config.general.dataset_path),
+        image_splits_path=Path(config.general.image_splits_path),
+        class_names_dict=config.class_names,
+        input_shape=config.dataloader.input_shape,
+        normalize=config.dataloader.normalize,
+        mode="test",
+    )
+    test_generator = dl_val.get_batched_dataset(config.general.batch_size)
+
     if config.general.output_dir is not None:
         experiment_path = (
             Path(config.general.output_dir) / config.general.experiment_name
@@ -85,7 +95,9 @@ def training_pipeline(config: DictConfig):
         monitor_metric=config.callbacks.monitor_metric,
         mode=config.callbacks.mode,
         lr_reduction_factor=config.callbacks.lr_reduction_factor,
-        patience=config.callbacks.patience,
+        lr_reduction_patience=config.callbacks.lr_reduction_patience,
+        early_stopping_patience=config.callbacks.early_stopping_patience,
+        min_delta=config.callbacks.min_delta,
         min_lr=config.callbacks.min_lr,
     )
 
@@ -120,6 +132,12 @@ def training_pipeline(config: DictConfig):
         steps_per_epoch=dl_train.length // config.general.batch_size,
         validation_steps=dl_val.length // config.general.batch_size,
         callbacks=callbacks,
+    )
+
+    model.evaluate(
+        test_generator,
+        batch_size=config.general.batch_size,
+        steps_per_epoch=dl_test.length // config.general.batch_size,
     )
 
 

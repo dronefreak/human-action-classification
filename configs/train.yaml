@@ -24,7 +24,9 @@ callbacks:
   monitor_metric: val_accuracy
   mode: max
   lr_reduction_factor: 0.9
-  patience: 50
+  lr_reduction_patience: 50
+  early_stopping_patience: 25
+  min_delta: 0.0
   min_lr: 1e-6
 
 class_names:

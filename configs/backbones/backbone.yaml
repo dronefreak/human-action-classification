@@ -12,8 +12,58 @@ mnv3:
   classifier_activation: softmax
   include_preprocessing: true
 
-backbone:
+inception_v3:
   _target_: tensorflow.keras.applications.InceptionV3
+  include_top: false
+  weights: imagenet
+  input_tensor: null
+  input_shape: null
+  pooling: null
+  classes: 1000
+  classifier_activation: softmax
+
+inception_resnet_v2:
+  _target_: tensorflow.keras.applications.InceptionResNetV2
+  include_top: false
+  weights: imagenet
+  input_tensor: null
+  input_shape: null
+  pooling: null
+  classes: 1000
+  classifier_activation: softmax
+
+backbone:
+  _target_: tensorflow.keras.applications.ResNet50
+  include_top: false
+  weights: imagenet
+  input_tensor: null
+  input_shape: null
+  pooling: null
+  classes: 1000
+  classifier_activation: softmax
+
+resnet50_v2:
+  _target_: tensorflow.keras.applications.ResNet50V2
+  include_top: false
+  weights: imagenet
+  input_tensor: null
+  input_shape: null
+  pooling: null
+  classes: 1000
+  classifier_activation: softmax
+
+resnet101:
+  _target_: tensorflow.keras.applications.ResNet101
+  include_top: false
+  weights: imagenet
+  input_tensor: null
+  input_shape: null
+  pooling: null
+  classes: 1000
+  classifier_activation: softmax
+
+resnet101_v2:
+  _target_: tensorflow.keras.applications.ResNet101V2
   include_top: false
   weights: imagenet
   input_tensor: null
