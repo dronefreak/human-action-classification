@@ -33,6 +33,7 @@ from pathlib import Path
 
 import hydra
 import tensorflow as tf
+import yaml
 from omegaconf import DictConfig, OmegaConf
 
 from src.callbacks import get_list_of_callbacks
@@ -141,6 +142,8 @@ def training_pipeline(config: DictConfig):
         return_dict=True,
     )
     console.print(metrics)
+    with open(experiment_path / "metrics.yml", "w") as outfile:
+        yaml.dump(metrics, outfile, default_flow_style=False)
 
 
 if __name__ == "__main__":
