@@ -140,7 +140,7 @@ class Dataloader:
         else:
             return rgb, gt
 
-    def get_batched_dataset(self, batch_size):
+    def get_batched_dataset(self, batch_size: int) -> tf.data.Dataset:
         seeds = tf.data.Dataset.random(seed=0).batch(batch_size)
         auto = tf.data.experimental.AUTOTUNE
         self.dataset = tf.data.Dataset.from_tensor_slices(
@@ -150,11 +150,11 @@ class Dataloader:
         self.dataset = self.dataset.shuffle(
             buffer_size=len(self.files_path_list), reshuffle_each_iteration=True
         )
-        self.dataset = (
-            self.dataset.repeat()
-            .map(map_func=self.parse_data, num_parallel_calls=auto)
-            .batch(batch_size=batch_size)
-        )
+        if self.mode in ["train", "val"]:
+            self.dataset = self.dataset.repeat()
+        self.dataset = self.dataset.map(
+            map_func=self.parse_data, num_parallel_calls=auto
+        ).batch(batch_size=batch_size)
         return self.dataset
 
 

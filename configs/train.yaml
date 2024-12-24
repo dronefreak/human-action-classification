@@ -10,6 +10,7 @@ general:
   batch_size: 256
   num_epochs: 500
   seed: 0
+  freeze_backbone: true
   multi_gpu_training: false
   dataset_path: /home/saumya.saksena/Downloads/Datasets/Stanford40/JPEGImages/
   image_splits_path: /home/saumya.saksena/Downloads/Datasets/Stanford40/ImageSplits

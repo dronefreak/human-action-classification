@@ -63,7 +63,7 @@ def training_pipeline(config: DictConfig):
         normalize=config.dataloader.normalize,
         mode="train",
     )
-    train_generator = dl_train.get_batched_dataset(config.general.batch_size)
+    train_generator = dl_train.get_batched_dataset(batch_size=config.general.batch_size)
 
     dl_val = Dataloader(
         dataset_path=Path(config.general.dataset_path),
@@ -73,7 +73,7 @@ def training_pipeline(config: DictConfig):
         normalize=config.dataloader.normalize,
         mode="val",
     )
-    val_generator = dl_val.get_batched_dataset(config.general.batch_size)
+    val_generator = dl_val.get_batched_dataset(batch_size=config.general.batch_size)
 
     dl_test = Dataloader(
         dataset_path=Path(config.general.dataset_path),
@@ -83,7 +83,7 @@ def training_pipeline(config: DictConfig):
         normalize=config.dataloader.normalize,
         mode="test",
     )
-    test_generator = dl_val.get_batched_dataset(config.general.batch_size)
+    test_generator = dl_test.get_batched_dataset(batch_size=config.general.batch_size)
 
     if config.general.output_dir is not None:
         experiment_path = (
@@ -104,7 +104,7 @@ def training_pipeline(config: DictConfig):
     def create_model():
         base_model = hydra.utils.instantiate(config.backbones.backbone)
         # Freeze the base model
-        base_model.trainable = False
+        base_model.trainable = config.general.freeze_backbone
         # Add custom layers for transfer learning
         x = tf.keras.layers.GlobalAveragePooling2D()(base_model.output)
         x = tf.keras.layers.Dense(256, activation="relu")(x)
@@ -134,11 +134,13 @@ def training_pipeline(config: DictConfig):
         callbacks=callbacks,
     )
 
-    model.evaluate(
+    metrics = model.evaluate(
         test_generator,
         batch_size=config.general.batch_size,
-        steps_per_epoch=dl_test.length // config.general.batch_size,
+        steps=len(test_generator),
+        return_dict=True,
     )
+    console.print(metrics)
 
 
 if __name__ == "__main__":
