@@ -33,7 +33,7 @@ from typing import Optional
 
 import tensorflow as tf
 
-# from sklearn.utils import shuffle
+# import tensorflow_models as tfm
 from tensorflow.python.keras import backend as K
 
 from src.utils import get_rich_console
@@ -47,13 +47,13 @@ class Dataloader:
         self,
         dataset_path: Path,
         image_splits_path: Path,
-        class_names_dict: dict,
+        stanford40_class_names_dict: dict,
         mode: str,
         input_shape: tuple,
         debug: Optional[bool] = False,
         normalize: Optional[bool] = False,
     ):
-        self.class_names_dict = class_names_dict
+        self.stanford40_class_names_dict = stanford40_class_names_dict
         self.mode = mode
         self.dataset_path = dataset_path
         self.input_shape = input_shape
@@ -86,20 +86,33 @@ class Dataloader:
             suffix = item.split("_")[-1]
             item = item.replace("_" + suffix, "")
             gt_labels.append(item)
-        gt_labels = [self.class_names_dict[item] for item in gt_labels]
+        gt_labels = [self.stanford40_class_names_dict[item] for item in gt_labels]
         return files_path_list, gt_labels
 
     def _random_crop(self, tensor: tf.Tensor, seed: tf.Tensor) -> tf.Tensor:
+        tensor = tf.cast(tensor, dtype=tf.uint8)
         tensor = tf.image.stateless_random_crop(tensor, self.input_shape, seed)
         return tensor
 
     def _random_flips(self, tensor: tf.Tensor, seed: tf.Tensor) -> tf.Tensor:
+        tensor = tf.cast(tensor, dtype=tf.uint8)
         tensor = tf.image.stateless_random_flip_left_right(tensor, seed)
         tensor = tf.image.stateless_random_flip_up_down(tensor, seed)
         return tensor
 
-    def _random_cast(self, tensor: tf.Tensor, seed: tf.Tensor) -> tf.Tensor:
+    def _random_contrast(self, tensor: tf.Tensor, seed: tf.Tensor) -> tf.Tensor:
+        tensor = tf.cast(tensor, dtype=tf.uint8)
         tensor = tf.image.stateless_random_contrast(tensor, 0.4, 1.6, seed)
+        return tensor
+
+    def _random_brightness(self, tensor: tf.Tensor, seed: tf.Tensor) -> tf.Tensor:
+        tensor = tf.cast(tensor, dtype=tf.uint8)
+        tensor = tf.image.stateless_random_brightness(tensor, 0.3, seed)
+        return tensor
+
+    def _random_saturation(self, tensor: tf.Tensor, seed: tf.Tensor) -> tf.Tensor:
+        tensor = tf.cast(tensor, dtype=tf.uint8)
+        tensor = tf.image.stateless_random_saturation(tensor, 0.5, 1.0, seed)
         return tensor
 
     def parse_data(self, items, seed):
@@ -114,8 +127,14 @@ class Dataloader:
         seed_flipping = tf.random.stateless_uniform(
             [2], minval=0, maxval=1000, dtype=tf.int32, seed=(seed[0] + 2, seed[0] + 3)
         )
-        seed_cast = tf.random.stateless_uniform(
+        seed_contrast = tf.random.stateless_uniform(
             [2], minval=0, maxval=1000, dtype=tf.int32, seed=(seed[0] + 4, seed[0] + 5)
+        )
+        seed_brightness = tf.random.stateless_uniform(
+            [2], minval=0, maxval=1000, dtype=tf.int32, seed=(seed[0] + 6, seed[0] + 7)
+        )
+        seed_saturation = tf.random.stateless_uniform(
+            [2], minval=0, maxval=1000, dtype=tf.int32, seed=(seed[0] + 8, seed[0] + 9)
         )
 
         # Crop randomly to appropriate shape
@@ -123,9 +142,11 @@ class Dataloader:
         rgb = tf.image.resize(rgb, (self.input_shape[0], self.input_shape[1]))
 
         if self.mode == "train":
-            # Flip and cast only during training
+            # Apply data augmentation only during training
             rgb = self._random_flips(rgb, seed_flipping)
-            rgb = self._random_cast(rgb, seed_cast)
+            rgb = self._random_contrast(rgb, seed_contrast)
+            rgb = self._random_brightness(rgb, seed_brightness)
+            rgb = self._random_saturation(rgb, seed_saturation)
 
         # Convert to tf.float32
         rgb = tf.cast(rgb, dtype=tf.float32)
@@ -174,7 +195,7 @@ if __name__ == "__main__":
     dl_example = Dataloader(
         dataset_path=config.general.dataset_path,
         image_splits_path=config.general.image_splits_path,
-        class_names_dict=config.class_names,
+        stanford40_class_names_dict=config.stanford40_class_names,
         mode="train",
     )
     generator = dl_example.get_batched_dataset(1)

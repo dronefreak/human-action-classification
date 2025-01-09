@@ -45,7 +45,9 @@ def split_train_val(config: DictConfig):
     global_train_split = []
     global_val_split = []
     for class_name, index in track(
-        config.class_names.items(), transient=False, description="Analyzing..."
+        config.stanford40_class_names.items(),
+        transient=False,
+        description="Analyzing...",
     ):
         sample = base_path / f"{class_name}_train.txt"
 

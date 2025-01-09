@@ -59,7 +59,7 @@ def training_pipeline(config: DictConfig):
     dl_train = Dataloader(
         dataset_path=Path(config.general.dataset_path),
         image_splits_path=Path(config.general.image_splits_path),
-        class_names_dict=config.class_names,
+        stanford40_class_names_dict=config.stanford40_class_names,
         input_shape=config.dataloader.input_shape,
         normalize=config.dataloader.normalize,
         mode="train",
@@ -69,7 +69,7 @@ def training_pipeline(config: DictConfig):
     dl_val = Dataloader(
         dataset_path=Path(config.general.dataset_path),
         image_splits_path=Path(config.general.image_splits_path),
-        class_names_dict=config.class_names,
+        stanford40_class_names_dict=config.stanford40_class_names,
         input_shape=config.dataloader.input_shape,
         normalize=config.dataloader.normalize,
         mode="val",
@@ -79,7 +79,7 @@ def training_pipeline(config: DictConfig):
     dl_test = Dataloader(
         dataset_path=Path(config.general.dataset_path),
         image_splits_path=Path(config.general.image_splits_path),
-        class_names_dict=config.class_names,
+        stanford40_class_names_dict=config.stanford40_class_names,
         input_shape=config.dataloader.input_shape,
         normalize=config.dataloader.normalize,
         mode="test",

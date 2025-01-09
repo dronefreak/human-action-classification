@@ -26,11 +26,11 @@ callbacks:
   mode: max
   lr_reduction_factor: 0.9
   lr_reduction_patience: 50
-  early_stopping_patience: 25
+  early_stopping_patience: 50
   min_delta: 0.0
   min_lr: 1e-6
 
-class_names:
+stanford40_class_names:
   {
     "applauding": 0,
     "blowing_bubbles": 1,
