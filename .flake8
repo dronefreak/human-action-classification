@@ -1,0 +1,4 @@
+[flake8]
+max-line-length = 88
+builtins = cmp
+ignore = E402,W503,E741,N802,N803,N806,N812,E203,E722
