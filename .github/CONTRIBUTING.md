@@ -251,10 +251,8 @@ Contributors get:
 
 ## License
 
-By contributing, you agree that your contributions will be licensed under the MIT License.
+By contributing, you agree that your contributions will be licensed under the Apache License.
 
 ---
 
 Thanks for making this repo better! 🚀
-
-**Remember**: This repo has 233+ stars because people found it useful. Let's keep that momentum going with modern, maintainable code.

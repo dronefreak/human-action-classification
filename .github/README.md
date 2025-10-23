@@ -38,6 +38,10 @@ Modern human action classification using **MediaPipe** pose estimation and **PyT
 ### Installation
 
 ```bash
+# Creat the conda environments
+conda env create -f environment.yml
+conda activate human-action-classification
+
 # Basic installation
 pip install -e .
 
@@ -353,5 +357,3 @@ MIT License - see [LICENSE](LICENSE) file for details.
 **Author**: Saumya Kumaar Saksena  
 **Contact**: [GitHub](https://github.com/dronefreak)  
 **Original Repo**: [human-action-classification](https://github.com/dronefreak/human-action-classification)
-
-_From TF 1.13 to modern PyTorch - because your code deserves an upgrade too._ 🚀
