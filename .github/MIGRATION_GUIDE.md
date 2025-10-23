@@ -300,5 +300,3 @@ The v2.0 rewrite maintains the **same core functionality** while:
 - Removing all pain points
 - Adding modern tooling
 - Improving performance dramatically
-
-Your stars brought us here - let's make this repo relevant for 2025! 🚀

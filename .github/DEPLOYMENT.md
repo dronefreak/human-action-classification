@@ -280,8 +280,8 @@ docker run -p 7860:7860 hac:v2
 ### Immediate
 
 - GPU for training (even a 1080 works)
-- Stanford 40 dataset (~2GB)
-- 2-4 hours for initial training
+- Stanford 40 dataset (~0.5GB)
+- ~2 hours for initial training
 
 ### Ongoing
 
@@ -308,10 +308,4 @@ Key achievements:
 - 📦 Professional packaging
 - 🚀 Ready for 2025
 
-The 233 stars you have show people want this. Now they'll actually be able to use it without spending hours debugging SWIG.
-
-**Next step**: Push to GitHub, train on Stanford 40, share the results. Let's show what modern ML engineering looks like.
-
 ---
-
-Built with 🔥 by someone who's had enough of TF 1.13 and SWIG compilation errors.
