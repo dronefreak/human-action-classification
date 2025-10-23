@@ -1,0 +1,74 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Model weights
+*.pth
+*.pt
+*.onnx
+*.pb
+weights/*.pth
+!weights/.gitkeep
+
+# Data
+data/
+datasets/
+*.jpg
+*.jpeg
+*.png
+*.mp4
+*.avi
+
+# Outputs
+outputs/
+logs/
+runs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Hydra
+outputs/
+multirun/
+.hydra/
