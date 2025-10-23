@@ -1,0 +1,83 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "human-action-classification"
+version = "2.0.0"
+description = "Modern human action classification using MediaPipe pose estimation and deep learning"
+authors = [{name = "Saumya Kumaar Saksena", email = "your.email@example.com"}]
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "Apache"}
+keywords = ["action-recognition", "pose-estimation", "computer-vision", "mediapipe", "pytorch"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "torch>=2.0.0",
+    "torchvision>=0.15.0",
+    "mediapipe>=0.10.0",
+    "opencv-python>=4.8.0",
+    "numpy>=1.24.0",
+    "pillow>=10.0.0",
+    "timm>=0.9.0",
+    "hydra-core>=1.3.0",
+    "tqdm>=4.65.0",
+    "scikit-learn>=1.3.0",
+    "pandas>=2.0.0",
+    "lark>=1.2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "black>=23.0.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+    "mypy>=1.4.0",
+]
+demo = [
+    "gradio>=4.0.0",
+    "matplotlib>=3.7.0",
+]
+train = [
+    "tensorboard>=2.14.0",
+    "wandb>=0.15.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/dronefreak/human-action-classification"
+Documentation = "https://github.com/dronefreak/human-action-classification/blob/v2/README.md"
+Repository = "https://github.com/dronefreak/human-action-classification"
+Issues = "https://github.com/dronefreak/human-action-classification/issues"
+
+[project.scripts]
+hac-infer = "hac.cli:infer"
+hac-train = "hac.cli:train"
+hac-demo = "hac.cli:demo"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 88
+target-version = ['py39']
+
+[tool.isort]
+profile = "black"
+line_length = 88
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
