@@ -78,6 +78,51 @@ def load_checkpoint(
     }
 
 
+def mixup_data(x, y, alpha=0.4, device="cuda"):
+    """Apply mixup augmentation to batch.
+
+    Args:
+        x: Input images (batch_size, C, H, W)
+        y: Labels (batch_size,)
+        alpha: Mixup interpolation strength (0.2-0.4 recommended)
+        device: Device for tensors
+
+    Returns:
+        mixed_x: Mixed images
+        y_a, y_b: Original labels for both images
+        lam: Mixing coefficient
+    """
+    import numpy as np
+
+    if alpha > 0:
+        lam = np.random.beta(alpha, alpha)
+    else:
+        lam = 1
+
+    batch_size = x.size(0)
+    index = torch.randperm(batch_size).to(device)
+
+    mixed_x = lam * x + (1 - lam) * x[index, :]
+    y_a, y_b = y, y[index]
+
+    return mixed_x, y_a, y_b, lam
+
+
+def mixup_criterion(criterion, pred, y_a, y_b, lam):
+    """Compute mixup loss.
+
+    Args:
+        criterion: Loss function (e.g., CrossEntropyLoss)
+        pred: Model predictions
+        y_a, y_b: Original labels
+        lam: Mixing coefficient
+
+    Returns:
+        Mixed loss
+    """
+    return lam * criterion(pred, y_a) + (1 - lam) * criterion(pred, y_b)
+
+
 class Trainer:
     """Training manager with resume support."""
 
@@ -94,6 +139,8 @@ class Trainer:
         start_epoch: int = 0,
         best_val_acc: float = 0.0,
         resume_history: Optional[Dict] = None,
+        use_mixup: bool = False,
+        mixup_alpha: float = 0.4,
     ):
         self.model = model.to(device)
         self.train_loader = train_loader
@@ -109,6 +156,10 @@ class Trainer:
         self.criterion = nn.CrossEntropyLoss()
         self.best_val_acc = best_val_acc
 
+        # Mixup settings
+        self.use_mixup = use_mixup
+        self.mixup_alpha = mixup_alpha
+
         # Metrics tracking - restore from checkpoint if available
         if resume_history:
             self.train_losses = resume_history.get("train_losses", [])
@@ -120,7 +171,7 @@ class Trainer:
             self.val_accuracies = []
 
     def train_epoch(self, epoch: int) -> float:
-        """Train for one epoch."""
+        """Train for one epoch with optional mixup."""
         self.model.train()
         total_loss = 0.0
         correct = 0
@@ -132,10 +183,21 @@ class Trainer:
             images = images.to(self.device)
             labels = labels.to(self.device)
 
+            # Apply mixup if enabled
+            if self.use_mixup:
+                images, labels_a, labels_b, lam = mixup_data(
+                    images, labels, alpha=self.mixup_alpha, device=self.device
+                )
+
             # Forward
             self.optimizer.zero_grad()
             outputs = self.model(images)
-            loss = self.criterion(outputs, labels)
+
+            # Compute loss (with or without mixup)
+            if self.use_mixup:
+                loss = mixup_criterion(self.criterion, outputs, labels_a, labels_b, lam)
+            else:
+                loss = self.criterion(outputs, labels)
 
             # Backward
             loss.backward()
@@ -145,7 +207,15 @@ class Trainer:
             total_loss += loss.item()
             _, predicted = outputs.max(1)
             total += labels.size(0)
-            correct += predicted.eq(labels).sum().item()
+
+            # For mixup, approximate accuracy using hard labels
+            if self.use_mixup:
+                correct += (
+                    lam * predicted.eq(labels_a).sum().item()
+                    + (1 - lam) * predicted.eq(labels_b).sum().item()
+                )
+            else:
+                correct += predicted.eq(labels).sum().item()
 
             # Update progress bar
             pbar.set_postfix(
@@ -156,7 +226,6 @@ class Trainer:
             )
 
         avg_loss = total_loss / len(self.train_loader)
-        _ = 100.0 * correct / total
 
         return avg_loss
 
@@ -297,6 +366,13 @@ def main():
     parser.add_argument(
         "--weight_decay", type=float, default=1e-4, help="Weight decay for optimizer"
     )
+    parser.add_argument("--mixup", action="store_true", help="Use mixup augmentation")
+    parser.add_argument(
+        "--mixup_alpha",
+        type=float,
+        default=0.4,
+        help="Mixup alpha parameter (0.2-0.4 recommended)",
+    )
 
     args = parser.parse_args()
 
@@ -373,6 +449,8 @@ def main():
         start_epoch=start_epoch,
         best_val_acc=best_val_acc,
         resume_history=resume_history,
+        use_mixup=args.mixup,
+        mixup_alpha=args.mixup_alpha,
     )
 
     # Train
