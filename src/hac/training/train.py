@@ -47,7 +47,15 @@ def load_checkpoint(
     # Load optimizer state if provided
     if optimizer is not None and "optimizer_state_dict" in checkpoint:
         optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
-        print("✓ Optimizer state loaded")
+
+        # CRITICAL FIX: Move optimizer states to correct device
+        # This fixes "Expected all tensors to be on the same device" error
+        for state in optimizer.state.values():
+            for k, v in state.items():
+                if isinstance(v, torch.Tensor):
+                    state[k] = v.to(device)
+
+        print(f"✓ Optimizer state loaded and moved to {device}")
 
     # Load scheduler state if provided
     if scheduler is not None and "scheduler_state_dict" in checkpoint:
