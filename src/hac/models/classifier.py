@@ -159,6 +159,7 @@ def create_model(
     model_name: str = "mobilenetv3_small_100",
     num_classes: int = 40,
     pretrained: bool = True,
+    freeze_backbone: bool = False,
     **kwargs,
 ) -> nn.Module:
     """Factory function to create models.
@@ -179,6 +180,7 @@ def create_model(
             num_classes=num_classes,
             pretrained=pretrained,
             input_type="image",
+            freeze_backbone=freeze_backbone,
             **kwargs,
         )
 
@@ -188,6 +190,7 @@ def create_model(
             num_classes=3,  # sitting, standing, lying
             pretrained=pretrained,
             input_type="image",
+            freeze_backbone=freeze_backbone,
             **kwargs,
         )
 
@@ -197,6 +200,7 @@ def create_model(
             num_classes=num_classes,
             pretrained=False,
             input_type="keypoints",
+            freeze_backbone=freeze_backbone,
             **kwargs,
         )
 

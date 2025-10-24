@@ -21,6 +21,7 @@ def get_training_transforms(input_size: int = 224):
             transforms.RandomRotation(degrees=10),
             transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
             transforms.ToTensor(),
+            transforms.RandomErasing(p=0.25, scale=(0.02, 0.2)),
             transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         ]
     )

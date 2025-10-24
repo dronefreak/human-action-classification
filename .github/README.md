@@ -208,6 +208,8 @@ Pose Class                   Action Class
 - vit_base_patch16_224
 ```
 
+For more information on the available models in timm, please refer to [TIMM_MODELS](timm_model_families.md)
+
 ## Project Structure
 
 ```
