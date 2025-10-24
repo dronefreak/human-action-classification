@@ -141,6 +141,7 @@ class Trainer:
         resume_history: Optional[Dict] = None,
         use_mixup: bool = False,
         mixup_alpha: float = 0.4,
+        label_smoothing: float = 0.1,
     ):
         self.model = model.to(device)
         self.train_loader = train_loader
@@ -153,7 +154,7 @@ class Trainer:
         self.max_epochs = max_epochs
         self.start_epoch = start_epoch
 
-        self.criterion = nn.CrossEntropyLoss()
+        self.criterion = nn.CrossEntropyLoss(label_smoothing=label_smoothing)
         self.best_val_acc = best_val_acc
 
         # Mixup settings
