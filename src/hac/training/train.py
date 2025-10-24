@@ -210,6 +210,7 @@ def main():
     parser.add_argument("--output_dir", type=str, default="outputs")
     parser.add_argument("--device", type=str, default="cuda")
     parser.add_argument("--num_workers", type=int, default=4)
+    parser.add_argument("--freeze_backbone", type=bool, default=False)
 
     args = parser.parse_args()
 
@@ -245,6 +246,7 @@ def main():
         model_name=args.model_name,
         num_classes=args.num_classes,
         pretrained=True,
+        freeze_backbone=args.freeze_backbone,
     )
 
     # Optimizer and scheduler
