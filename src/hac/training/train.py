@@ -141,7 +141,7 @@ class Trainer:
         resume_history: Optional[Dict] = None,
         use_mixup: bool = False,
         mixup_alpha: float = 0.4,
-        label_smoothing: float = 0.1,
+        label_smoothing: float = 0.0,
     ):
         self.model = model.to(device)
         self.train_loader = train_loader
@@ -374,6 +374,9 @@ def main():
         default=0.4,
         help="Mixup alpha parameter (0.2-0.4 recommended)",
     )
+    parser.add_argument(
+        "--label_smoothing", type=float, default=0.0, help="Label smoothing for loss"
+    )
 
     args = parser.parse_args()
 
@@ -452,6 +455,7 @@ def main():
         resume_history=resume_history,
         use_mixup=args.mixup,
         mixup_alpha=args.mixup_alpha,
+        label_smoothing=args.label_smoothing,
     )
 
     # Train
