@@ -38,8 +38,10 @@ Modern human action classification using **MediaPipe** pose estimation and **PyT
 ### Installation
 
 ```bash
-# Creat the conda environments
+# Creat the conda env
 conda env create -f environment.yml
+
+# Activate the conda env
 conda activate human-action-classification
 
 # Basic installation
@@ -78,7 +80,7 @@ print(f"Action: {result['action']['top_class']}")
 print(f"Confidence: {result['action']['top_confidence']:.2f}")
 ```
 
-### Command Line
+### Command Line: Quickstart
 
 ```bash
 # Single image
@@ -89,6 +91,9 @@ hac-infer --video video.mp4 --model weights/best.pth
 
 # Real-time webcam
 hac-infer --webcam --model weights/best.pth
+
+# Real-time webcam (uses pretrained ImageNet backbone)
+python scripts/simple_demo.py --webcam
 
 # Launch web demo
 hac-demo --model weights/best.pth --share
@@ -158,6 +163,17 @@ trainer = Trainer(
 )
 
 trainer.train()
+```
+
+### 4. Train on Your Data
+
+```bash
+# Organize data as: data/train/class1/, data/val/class1/, ...
+python -m hac.training.train \
+    --data_dir data/ \
+    --model_name mobilenetv3_small_100 \
+    --num_classes 40 \
+    --epochs 50
 ```
 
 ## Architecture
