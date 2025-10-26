@@ -217,6 +217,17 @@ Pose Class                   Action Class
 - vit_base_patch16_224
 ```
 
+## Model Comparison
+
+| Model                 | Accuracy (%) | Macro Precision | Macro Recall | Macro F1 | Weighted F1 |
+| :-------------------- | -----------: | --------------: | -----------: | -------: | ----------: |
+| resnet50              |         88.5 |          0.8874 |        0.885 |   0.8842 |      0.8842 |
+| resnet34              |         86.4 |          0.8686 |        0.864 |   0.8618 |      0.8618 |
+| resnet18              |         82.3 |          0.8211 |        0.823 |   0.8178 |      0.8178 |
+| mobilenetv3_large_100 |         82.1 |          0.8216 |        0.821 |   0.8169 |      0.8169 |
+| vit_base_patch16_224  |         76.8 |          0.7774 |        0.768 |    0.765 |       0.765 |
+| mobilenetv3_small_100 |        74.35 |          0.7382 |       0.7435 |    0.735 |       0.735 |
+
 For more information on the available models in timm, please refer to [TIMM_MODELS](timm_model_families.md)
 
 ## Project Structure
