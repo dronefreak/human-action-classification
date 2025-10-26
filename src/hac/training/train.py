@@ -17,6 +17,58 @@ from hac.models.classifier import create_model
 from hac.utils.transforms import get_inference_transforms, get_training_transforms
 
 
+def convert_to_safetensors(checkpoint_path: str, output_path: str = None) -> str:
+    """Convert PyTorch checkpoint to SafeTensors format.
+
+    Args:
+        checkpoint_path: Path to .pth checkpoint
+        output_path: Output path (default: model.safetensors in same dir)
+
+    Returns:
+        Path to SafeTensors file or None if conversion failed
+    """
+    try:
+        from safetensors.torch import save_file
+    except ImportError:
+        print("\n⚠️  SafeTensors not installed. Skipping conversion.")
+        print("   Install with: pip install safetensors")
+        return None
+
+    from pathlib import Path
+
+    checkpoint_path = Path(checkpoint_path)
+    output_path = (
+        Path(output_path)
+        if output_path
+        else checkpoint_path.parent / "model.safetensors"
+    )
+
+    print("\n🔄 Converting to SafeTensors...")
+
+    try:
+        # Load checkpoint (CPU to avoid GPU memory)
+        checkpoint = torch.load(checkpoint_path, map_location="cpu")
+
+        # Extract state dict
+        state_dict = checkpoint.get("model_state_dict", checkpoint)
+
+        # Save as SafeTensors
+        save_file(state_dict, str(output_path))
+
+        # Size comparison
+        orig_size = checkpoint_path.stat().st_size / 1024**2
+        new_size = output_path.stat().st_size / 1024**2
+
+        print(f"✓ SafeTensors saved: {output_path.name}")
+        print(f"  Size: {orig_size:.1f}MB → {new_size:.1f}MB")
+
+        return str(output_path)
+
+    except Exception as e:
+        print(f"❌ Conversion failed: {e}")
+        return None
+
+
 def load_checkpoint(
     checkpoint_path: str,
     model: nn.Module,
@@ -345,6 +397,17 @@ class Trainer:
         }
         with open(self.output_dir / "history.json", "w") as f:
             json.dump(history, f, indent=2)
+
+        # Auto-convert best checkpoint to SafeTensors
+        best_checkpoint = self.output_dir / "best.pth"
+        if best_checkpoint.exists():
+            safetensors_path = convert_to_safetensors(
+                checkpoint_path=str(best_checkpoint),
+                output_path=str(self.output_dir / "model.safetensors"),
+            )
+
+            if safetensors_path:
+                print(f"\n✅ Deployment-ready model: {safetensors_path}")
 
 
 def main():

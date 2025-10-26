@@ -66,23 +66,101 @@ class ActionPredictor:
         # Get transforms
         self.transform = get_inference_transforms()
 
-    def _load_model(self, model_path: str) -> torch.nn.Module:
-        """Load model from checkpoint."""
-        checkpoint = torch.load(model_path, map_location=self.device)
+    def _load_model(self, model_path: str):
+        """Load model from local path or HuggingFace Hub."""
 
-        # Extract config if available
-        if "config" in checkpoint:
-            config = checkpoint["config"]
-            model = ActionClassifier(**config)
+        # Handle HuggingFace URLs
+        if model_path.startswith(("https://huggingface.co/", "hf://")):
+            print("Downloading model from HuggingFace...")
+
+            try:
+                from huggingface_hub import hf_hub_download
+            except ImportError:
+                raise ImportError(
+                    "huggingface_hub is required to download models. "
+                    "Install with: pip install huggingface_hub"
+                )
+
+            # Parse HuggingFace URL
+            if model_path.startswith("https://huggingface.co/"):
+                parts = model_path.replace("https://huggingface.co/", "").split("/")
+                repo_id = f"{parts[0]}/{parts[1]}"
+
+                if "resolve" in parts:
+                    resolve_idx = parts.index("resolve")
+                    filename = "/".join(parts[resolve_idx + 2 :])
+                else:
+                    filename = "model.safetensors"
+
+            elif model_path.startswith("hf://"):
+                path = model_path.replace("hf://", "")
+                parts = path.split("/")
+                repo_id = f"{parts[0]}/{parts[1]}"
+                filename = (
+                    "/".join(parts[2:]) if len(parts) > 2 else "model.safetensors"
+                )
+
+            # Download from HuggingFace Hub
+            try:
+                model_path = hf_hub_download(
+                    repo_id=repo_id, filename=filename, cache_dir=None
+                )
+                print(f"✓ Downloaded to: {model_path}")
+            except Exception as e:
+                raise ValueError(
+                    f"Failed to download model from HuggingFace: {e}\n"
+                    f"Repo: {repo_id}\n"
+                    f"File: {filename}"
+                )
+
+        # Check if it's a SafeTensors file
+        if model_path.endswith(".safetensors"):
+            # Load SafeTensors format
+            try:
+                from safetensors.torch import load_file
+            except ImportError:
+                raise ImportError(
+                    "safetensors is required to load .safetensors files. "
+                    "Install with: pip install safetensors"
+                )
+
+            state_dict = load_file(model_path)
+            config = {}  # SafeTensors doesn't store config
+
         else:
-            # Fallback to default
-            model = ActionClassifier(model_name="mobilenetv3_small_100", num_classes=40)
+            # Load PyTorch checkpoint - FIX: Add weights_only=False for compatibility
+            checkpoint = torch.load(
+                model_path, map_location=self.device, weights_only=False
+            )
+
+            # Extract state dict and config
+            if isinstance(checkpoint, dict):
+                state_dict = checkpoint.get("model_state_dict", checkpoint)
+                config = checkpoint.get("config", {})
+            else:
+                state_dict = checkpoint
+                config = {}
+
+        # Get model parameters
+        model_name = config.get("model_name", "resnet34")
+        num_classes = config.get("num_classes", 40)
+
+        # Create model
+        from hac.models.classifier import create_model
+
+        model = create_model(
+            model_type="action",
+            model_name=model_name,
+            num_classes=num_classes,
+            pretrained=False,
+        )
 
         # Load weights
-        if "model_state_dict" in checkpoint:
-            model.load_state_dict(checkpoint["model_state_dict"])
-        else:
-            model.load_state_dict(checkpoint)
+        model.load_state_dict(state_dict)
+        model = model.to(self.device)
+        model.eval()
+
+        print(f"✓ Model loaded: {model_name} ({num_classes} classes)")
 
         return model
 
