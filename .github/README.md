@@ -33,6 +33,15 @@ Modern human action classification using **MediaPipe** pose estimation and **PyT
 - 📊 **Training pipeline**: Ready-to-use training scripts
 - 🚗 **AV-ready**: Can be adapted for pedestrian action prediction
 
+## Examples
+
+<table>
+  <tr>
+    <td><img src="../assets/gardening.jpg" width="300" height="200"/></td>
+    <td><img src="../assets/looking_through_a_telescope.jpg" width="300" height="200"/></td>
+  </tr>
+</table>
+
 ## Quick Start
 
 ### Installation
@@ -372,6 +381,6 @@ Apache License - see [LICENSE](../LICENSE) file for details.
 
 ---
 
-**Author**: Saumya Kumaar Saksena  
-**Contact**: [GitHub](https://github.com/dronefreak)  
+**Author**: Saumya Kumaar Saksena
+**Contact**: [GitHub](https://github.com/dronefreak)
 **Original Repo**: [human-action-classification](https://github.com/dronefreak/human-action-classification)

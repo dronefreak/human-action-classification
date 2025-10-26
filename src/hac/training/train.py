@@ -377,6 +377,9 @@ def main():
     parser.add_argument(
         "--label_smoothing", type=float, default=0.0, help="Label smoothing for loss"
     )
+    parser.add_argument(
+        "--auto_evaluate", action="store_true", help="Auto evaluate after training"
+    )
 
     args = parser.parse_args()
 
@@ -460,6 +463,27 @@ def main():
 
     # Train
     trainer.train()
+
+    # Automatic evaluation after training
+    if args.auto_evaluate:
+        print("\n" + "=" * 60)
+        print("Running automatic evaluation...")
+        print("=" * 60)
+
+        import subprocess
+
+        subprocess.run(
+            [
+                "python",
+                "evaluate.py",
+                "--checkpoint",
+                f"{args.output_dir}/best.pth",
+                "--data_dir",
+                args.data_dir,
+                "--output_dir",
+                f"{args.output_dir}/evaluation",
+            ]
+        )
 
 
 if __name__ == "__main__":
