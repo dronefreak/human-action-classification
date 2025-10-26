@@ -1,8 +1,9 @@
 # Human Action Classification v2.0 🚀
 
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
-[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-red.svg)](https://pytorch.org/)
-[![License: Apache](https://img.shields.io/badge/License-Apache-yellow.svg)](https://opensource.org/licenses/Apache)
+[![🐍 Python 3.9+](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white&style=for-the-badge)](https://www.python.org/downloads/)
+[![🔥 PyTorch 2.0+](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C?logo=pytorch&logoColor=white&style=for-the-badge)](https://pytorch.org/)
+[![🤗 HuggingFace Models](https://img.shields.io/badge/HuggingFace-Models-FFD21E?logo=huggingface&logoColor=yellow&style=for-the-badge)](https://huggingface.co/dronefreak/human-action-classification-stanford40)
+[![⚖️ License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-green?logo=open-source-initiative&logoColor=white&style=for-the-badge)](https://opensource.org/licenses/Apache-2.0)
 
 Modern human action classification using **MediaPipe** pose estimation and **PyTorch** deep learning. Complete rewrite of the original TensorFlow 1.13 version with 10x faster inference and zero C++ compilation headaches.
 
@@ -217,7 +218,7 @@ Pose Class                   Action Class
 - vit_base_patch16_224
 ```
 
-## Model Comparison
+## Model Comparison for Stanfor40
 
 | Model                 | Accuracy (%) | Macro Precision | Macro Recall | Macro F1 | Weighted F1 |
 | :-------------------- | -----------: | --------------: | -----------: | -------: | ----------: |
@@ -229,6 +230,23 @@ Pose Class                   Action Class
 | mobilenetv3_small_100 |        74.35 |          0.7382 |       0.7435 |    0.735 |       0.735 |
 
 For more information on the available models in timm, please refer to [TIMM_MODELS](timm_model_families.md)
+
+## 🤗 Pre-trained Models
+
+All models trained on Stanford 40 Actions are available on HuggingFace Hub:
+
+<details>
+<summary><b>📊 View All Available Pre-trained Models</b></summary>
+
+| Model             | Accuracy | F1 Score | Size | Speed | Link                                                                                                             |
+| ----------------- | -------- | -------- | ---- | ----- | ---------------------------------------------------------------------------------------------------------------- |
+| ResNet50          | 88.5%    | 0.8842   | 94MB | 30ms  | [Download](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/resnet50)          |
+| ResNet34          | 86.4%    | 0.8618   | 85MB | 25ms  | [Download](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/resnet34)          |
+| ResNet18          | 82.3%    | 0.8178   | 45MB | 18ms  | [Download](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/resnet18)          |
+| MobileNetV3 Large | 82.1%    | 0.8169   | 20MB | 15ms  | [Download](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/mobilenetv3_large) |
+| MobileNetV3 Small | 74.35%   | 0.7350   | 10MB | 10ms  | [Download](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/mobilenetv3_small) |
+
+</details>
 
 ## Project Structure
 
