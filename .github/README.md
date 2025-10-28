@@ -218,35 +218,19 @@ Pose Class                   Action Class
 - vit_base_patch16_224
 ```
 
-## Model Comparison for Stanfor40
+## 📊 Model Comparison for Stanford40
 
-| Model                 | Accuracy (%) | Macro Precision | Macro Recall | Macro F1 | Weighted F1 |
-| :-------------------- | -----------: | --------------: | -----------: | -------: | ----------: |
-| resnet50              |         88.5 |          0.8874 |        0.885 |   0.8842 |      0.8842 |
-| resnet34              |         86.4 |          0.8686 |        0.864 |   0.8618 |      0.8618 |
-| resnet18              |         82.3 |          0.8211 |        0.823 |   0.8178 |      0.8178 |
-| mobilenetv3_large_100 |         82.1 |          0.8216 |        0.821 |   0.8169 |      0.8169 |
-| vit_base_patch16_224  |         76.8 |          0.7774 |        0.768 |    0.765 |       0.765 |
-| mobilenetv3_small_100 |        74.35 |          0.7382 |       0.7435 |    0.735 |       0.735 |
+| Model                | Accuracy (%) | Macro Precision | Macro Recall | Macro F1 | Weighted F1 | Download                                                                                                                                                                                                                      |
+| :------------------- | -----------: | --------------: | -----------: | -------: | ----------: | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ResNet50             |         88.5 |          0.8874 |        0.885 |   0.8842 |      0.8842 | [![🤗](https://img.shields.io/badge/Download-HuggingFace-FFD21E?logo=huggingface&logoColor=yellow&style=for-the-badge)](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/resnet50)          |
+| ResNet34             |         86.4 |          0.8686 |        0.864 |   0.8618 |      0.8618 | [![🤗](https://img.shields.io/badge/Download-HuggingFace-FFD21E?logo=huggingface&logoColor=yellow&style=for-the-badge)](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/resnet34)          |
+| ResNet18             |         82.3 |          0.8211 |        0.823 |   0.8178 |      0.8178 | [![🤗](https://img.shields.io/badge/Download-HuggingFace-FFD21E?logo=huggingface&logoColor=yellow&style=for-the-badge)](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/resnet18)          |
+| MobileNetV3 Large    |         82.1 |          0.8216 |        0.821 |   0.8169 |      0.8169 | [![🤗](https://img.shields.io/badge/Download-HuggingFace-FFD21E?logo=huggingface&logoColor=yellow&style=for-the-badge)](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/mobilenetv3_large) |
+| Vit Base Patch16 224 |         76.8 |          0.7774 |        0.768 |    0.765 |       0.765 | –                                                                                                                                                                                                                             |
+| MobileNetV3 Small    |        74.35 |          0.7382 |       0.7435 |    0.735 |       0.735 | [![🤗](https://img.shields.io/badge/Download-HuggingFace-FFD21E?logo=huggingface&logoColor=yellow&style=for-the-badge)](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/mobilenetv3_small) |
 
-For more information on the available models in timm, please refer to [TIMM_MODELS](timm_model_families.md)
-
-## 🤗 Pre-trained Models
-
-All models trained on Stanford 40 Actions are available on HuggingFace Hub:
-
-<details>
-<summary><b>📊 View All Available Pre-trained Models</b></summary>
-
-| Model             | Accuracy | F1 Score | Size | Speed | Link                                                                                                             |
-| ----------------- | -------- | -------- | ---- | ----- | ---------------------------------------------------------------------------------------------------------------- |
-| ResNet50          | 88.5%    | 0.8842   | 94MB | 30ms  | [Download](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/resnet50)          |
-| ResNet34          | 86.4%    | 0.8618   | 85MB | 25ms  | [Download](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/resnet34)          |
-| ResNet18          | 82.3%    | 0.8178   | 45MB | 18ms  | [Download](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/resnet18)          |
-| MobileNetV3 Large | 82.1%    | 0.8169   | 20MB | 15ms  | [Download](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/mobilenetv3_large) |
-| MobileNetV3 Small | 74.35%   | 0.7350   | 10MB | 10ms  | [Download](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/mobilenetv3_small) |
-
-</details>
+> 💡 **Note**: All downloadable models are licensed under [Apache 2.0](https://opensource.org/licenses/Apache-2.0) and trained on the **Stanford40 Actions** dataset.  
+> For more information on the available models in `timm`, please refer to [TIMM_MODELS](timm_model_families.md).
 
 ## Project Structure
 
