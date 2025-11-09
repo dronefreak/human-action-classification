@@ -19,7 +19,7 @@ def run_evaluation(
     """Run evaluation script for a single model."""
     cmd = [
         "python",
-        "src/hac/inference/evaluate.py",
+        "src/hac/image/inference/evaluate.py",
         "--checkpoint",
         checkpoint,
         "--data_dir",

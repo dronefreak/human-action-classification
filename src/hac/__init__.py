@@ -1,13 +1,21 @@
-"""Human Action Classification v2.0.
-
-Modern action recognition using MediaPipe pose estimation and PyTorch. Completely
-rewritten from the TensorFlow 1.13 version.
-"""
+"""Human Action Classification - Image and Video."""
 
 __version__ = "2.0.0"
-__author__ = "Saumya Kumaar Saksena"
 
-from hac.inference.predictor import ActionPredictor
-from hac.models.classifier import ActionClassifier
+# Common utilities
+from .common.metrics import compute_accuracy, compute_metrics
 
-__all__ = ["ActionPredictor", "ActionClassifier"]
+# Image module (backward compatibility)
+from .image.inference.predictor import ActionPredictor as ImagePredictor
+from .image.models.classifier import ActionClassifier
+
+# Video module
+from .video.models.classifier import Video3DCNN
+
+__all__ = [
+    "ImagePredictor",
+    "ActionClassifier",
+    "Video3DCNN",
+    "compute_accuracy",
+    "compute_metrics",
+]

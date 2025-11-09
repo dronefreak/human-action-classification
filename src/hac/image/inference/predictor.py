@@ -6,9 +6,9 @@ import cv2
 import numpy as np
 import torch
 
-from hac.inference.pose_extractor import PoseClassifier, PoseExtractor
-from hac.models.classifier import ActionClassifier
-from hac.utils.transforms import get_inference_transforms
+from hac.common.transforms import get_inference_transforms
+from hac.image.inference.pose_extractor import PoseClassifier, PoseExtractor
+from hac.image.models.classifier import ActionClassifier
 
 
 class ActionPredictor:

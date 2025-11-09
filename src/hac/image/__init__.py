@@ -1,0 +1,1 @@
+"""Image action recognition module."""
