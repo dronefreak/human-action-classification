@@ -12,13 +12,16 @@ from torchvision import transforms
 from tqdm import tqdm
 
 from hac.common.metrics import compute_metrics
+from hac.video.data.augmentations import VideoAugmentation, mixup_criterion
 from hac.video.data.dataset import VideoDataset
 from hac.video.models.classifier import Video3DCNN
 
+torch.backends.cudnn.benchmark = True  # Auto-tune kernels
+torch.backends.cuda.matmul.allow_tf32 = True
+torch.backends.cudnn.allow_tf32 = True
+
 
 class VideoTrainer:
-    """Trainer for video action recognition."""
-
     def __init__(
         self,
         model,
@@ -30,6 +33,9 @@ class VideoTrainer:
         device,
         output_dir,
         max_epochs=50,
+        use_augmentation=True,
+        mixup_alpha=0.4,
+        cutmix_alpha=1.0,
     ):
         self.model = model
         self.train_loader = train_loader
@@ -41,6 +47,20 @@ class VideoTrainer:
         self.output_dir = Path(output_dir)
         self.max_epochs = max_epochs
 
+        # Video augmentation
+        if use_augmentation:
+            self.video_aug = VideoAugmentation(
+                mixup_alpha=mixup_alpha,
+                mixup_prob=0.5,
+                cutmix_alpha=cutmix_alpha,
+                cutmix_prob=0.5,
+                frame_drop_rate=0.2,
+                frame_drop_prob=0.3,
+                temporal_jitter_prob=0.2,
+            )
+        else:
+            self.video_aug = None
+
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
         self.best_val_acc = 0.0
@@ -49,7 +69,7 @@ class VideoTrainer:
         self.val_accuracies = []
 
     def train_epoch(self, epoch):
-        """Train for one epoch."""
+        """Train for one epoch with video augmentations."""
         self.model.train()
         running_loss = 0.0
         correct = 0
@@ -63,18 +83,35 @@ class VideoTrainer:
             videos = videos.to(self.device)
             labels = labels.to(self.device)
 
+            # Apply video augmentation
+            if self.video_aug is not None:
+                videos, labels = self.video_aug(videos, labels)
+
             self.optimizer.zero_grad()
 
             outputs = self.model(videos)
-            loss = self.criterion(outputs, labels)
+
+            # Compute loss (handles both regular and mixed labels)
+            loss = mixup_criterion(self.criterion, outputs, labels)
 
             loss.backward()
             self.optimizer.step()
 
             running_loss += loss.item()
-            _, predicted = outputs.max(1)
-            total += labels.size(0)
-            correct += predicted.eq(labels).sum().item()
+
+            # Accuracy (use original labels for mixed samples)
+            if isinstance(labels, tuple):
+                labels_a, labels_b, lam = labels
+                _, predicted = outputs.max(1)
+                total += labels_a.size(0)
+                correct += (
+                    lam * predicted.eq(labels_a).sum().item()
+                    + (1 - lam) * predicted.eq(labels_b).sum().item()
+                )
+            else:
+                _, predicted = outputs.max(1)
+                total += labels.size(0)
+                correct += predicted.eq(labels).sum().item()
 
             acc = 100.0 * correct / total
             pbar.set_postfix(
@@ -256,7 +293,30 @@ def main():
         "--step_size", type=int, default=20, help="LR scheduler step size"
     )
     parser.add_argument("--gamma", type=float, default=0.1, help="LR scheduler gamma")
-
+    parser.add_argument(
+        "--use_augmentation",
+        action="store_true",
+        default=True,
+        help="Use video augmentations (MixUp, CutMix, etc.)",
+    )
+    parser.add_argument(
+        "--no_augmentation",
+        action="store_false",
+        dest="use_augmentation",
+        help="Disable video augmentations",
+    )
+    parser.add_argument(
+        "--mixup_alpha", type=float, default=0.4, help="MixUp alpha parameter"
+    )
+    parser.add_argument(
+        "--cutmix_alpha", type=float, default=1.0, help="CutMix alpha parameter"
+    )
+    parser.add_argument(
+        "--label_smoothing",
+        type=float,
+        default=4,
+        help="Label smoothing value for the cross-entropy loss",
+    )
     # System
     parser.add_argument("--num_workers", type=int, default=4, help="DataLoader workers")
     parser.add_argument("--device", type=str, default="cuda", help="Device (cuda/cpu)")
@@ -364,7 +424,7 @@ def main():
     print(f"Parameters: {sum(p.numel() for p in model.parameters()) / 1e6:.1f}M")
 
     # Loss and optimizer
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss(label_smoothing=args.label_smoothing).to(device)
     optimizer = torch.optim.SGD(
         model.parameters(), lr=args.lr, momentum=0.9, weight_decay=args.weight_decay
     )
@@ -384,6 +444,9 @@ def main():
         device=device,
         output_dir=args.output_dir,
         max_epochs=args.epochs,
+        use_augmentation=args.use_augmentation,
+        mixup_alpha=args.mixup_alpha,
+        cutmix_alpha=args.cutmix_alpha,
     )
 
     # Train
