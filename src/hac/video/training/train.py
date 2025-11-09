@@ -276,8 +276,12 @@ def main():
         [
             transforms.ToPILImage(),
             transforms.Resize((128, 171)),
-            transforms.RandomCrop(args.spatial_size),
-            transforms.RandomHorizontalFlip(),
+            transforms.RandomCrop(112),
+            transforms.RandomHorizontalFlip(p=0.5),
+            transforms.ColorJitter(
+                brightness=0.4, contrast=0.4, saturation=0.4, hue=0.1
+            ),
+            transforms.RandomGrayscale(p=0.1),
             transforms.ToTensor(),
             transforms.Normalize(
                 mean=[0.43216, 0.394666, 0.37645], std=[0.22803, 0.22145, 0.216989]

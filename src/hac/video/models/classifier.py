@@ -21,7 +21,9 @@ class Video3DCNN(nn.Module):
 
         # Replace final FC layer
         in_features = self.backbone.fc.in_features
-        self.backbone.fc = nn.Linear(in_features, num_classes)
+        self.backbone.fc = nn.Sequential(
+            nn.Dropout(0.2), nn.Linear(in_features, num_classes)
+        )
 
         self.model_name = model_name
         self.num_classes = num_classes
