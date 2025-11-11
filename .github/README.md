@@ -4,7 +4,6 @@
 [![🔥 PyTorch 2.0+](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C?logo=pytorch&logoColor=white&style=for-the-badge)](https://pytorch.org/)
 [![🤗 HuggingFace Models](https://img.shields.io/badge/HuggingFace-Models-FFD21E?logo=huggingface&logoColor=yellow&style=for-the-badge)](https://huggingface.co/dronefreak/human-action-classification-stanford40)
 [![⚖️ License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-green?logo=open-source-initiative&logoColor=white&style=for-the-badge)](https://opensource.org/licenses/Apache-2.0)
-[![⭐ GitHub stars](https://img.shields.io/github/stars/dronefreak/human-action-classification?style=for-the-badge)](https://github.com/dronefreak/human-action-classification/stargazers)
 
 **The fastest way to classify human actions in images and video.** MediaPipe pose estimation + PyTorch CNNs with **90 FPS real-time performance**. Zero C++ compilation, pure Python.
 
