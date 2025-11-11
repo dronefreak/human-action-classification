@@ -267,7 +267,16 @@ def main():
         "--model",
         type=str,
         default="r3d_18",
-        choices=["r3d_18", "mc3_18", "r2plus1d_18"],
+        choices=[
+            "r3d_18",
+            "mc3_18",
+            "r2plus1d_18",
+            "tiny_c3d",
+            "r3d_10",
+            "r3d_8",
+            "r3d_6",
+            "r3d_4",
+        ],
         help="3D CNN model",
     )
     parser.add_argument(
