@@ -23,7 +23,7 @@ Security vulnerabilities should not be disclosed publicly until a fix is availab
 
 Please report security vulnerabilities by emailing:
 
-**Email**: [your-email@example.com]
+**Email**: [kumaar324@gmail.com]
 
 Or use GitHub's private vulnerability reporting:
 
