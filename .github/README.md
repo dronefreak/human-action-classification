@@ -45,10 +45,10 @@ pip install -e ".[demo]" && hac-demo
 
 ## ⚡ Why v2.0?
 
-✅ **90 FPS real-time** (11ms per frame on RTX 4070 Super)
-✅ **Zero C++ compilation** — pure Python `pip install`
-✅ **100+ architectures** — swap any timm model
-✅ **88.5% accuracy** on Stanford40 dataset
+- ✅ **90 FPS real-time** (11ms per frame on RTX 4070 Super)
+- ✅ **Zero C++ compilation** — pure Python `pip install`
+- ✅ **100+ architectures** — swap any timm model
+- ✅ **88.5% accuracy** on Stanford40 dataset
 
 <details>
 <summary>📊 Detailed Comparison: v1.0 vs v2.0</summary>
