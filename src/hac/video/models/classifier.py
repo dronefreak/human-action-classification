@@ -7,12 +7,33 @@ Add this to your existing classifier.py
 import torch.nn as nn
 from torchvision.models.video import (
     MC3_18_Weights,
+    MViT_V1_B_Weights,
+    MViT_V2_S_Weights,
     R2Plus1D_18_Weights,
     R3D_18_Weights,
+    Swin3D_B_Weights,
+    Swin3D_S_Weights,
+    Swin3D_T_Weights,
     mc3_18,
+    mvit_v1_b,
+    mvit_v2_s,
     r2plus1d_18,
     r3d_18,
+    swin3d_b,
+    swin3d_s,
+    swin3d_t,
 )
+
+MODEL_REGISTRY = {
+    "r3d_18": (r3d_18, R3D_18_Weights),
+    "mc3_18": (mc3_18, MC3_18_Weights),
+    "r2plus1d_18": (r2plus1d_18, R2Plus1D_18_Weights),
+    "mvit_v1_b": (mvit_v1_b, MViT_V1_B_Weights),
+    "mvit_v2_s": (mvit_v2_s, MViT_V2_S_Weights),
+    "swin3d_t": (swin3d_t, Swin3D_T_Weights),
+    "swin3d_s": (swin3d_s, Swin3D_S_Weights),
+    "swin3d_b": (swin3d_b, Swin3D_B_Weights),
+}
 
 
 class Video3DCNN(nn.Module):
@@ -23,44 +44,18 @@ class Video3DCNN(nn.Module):
     ):
         super().__init__()
 
-        # Check if it's a lightweight model
-        if model_name.startswith("r3d_") and model_name not in [
-            "r3d_18",
-            "r2plus1d_18",
-        ]:
-            # Lightweight model from scratch
-            from hac.video.models.models import create_lightweight_model
+        try:
+            constructor, weight_class = MODEL_REGISTRY[model_name]
+        except KeyError:
+            raise ValueError(f"Unknown model: {model_name}")
 
-            self.backbone = create_lightweight_model(
-                model_name=model_name, num_classes=num_classes, dropout=dropout
-            )
-            self.is_lightweight = True
+        weights = weight_class.DEFAULT if pretrained else None
+        self.backbone = constructor(weights=weights)
 
-        elif model_name == "tiny_c3d":
-            # Tiny C3D model
-            from hac.video.models.models import TinyC3D
-
-            self.backbone = TinyC3D(num_classes=num_classes, dropout=dropout)
-            self.is_lightweight = True
-
-        else:
-            # Standard pretrained models
-            if model_name == "r3d_18":
-                weights = R3D_18_Weights.DEFAULT if pretrained else None
-                self.backbone = r3d_18(weights=weights)
-            elif model_name == "mc3_18":
-                weights = MC3_18_Weights.DEFAULT if pretrained else None
-                self.backbone = mc3_18(weights=weights)
-            elif model_name == "r2plus1d_18":
-                weights = R2Plus1D_18_Weights.DEFAULT if pretrained else None
-                self.backbone = r2plus1d_18(weights=weights)
-            else:
-                raise ValueError(f"Unknown model: {model_name}")
-
-            # Replace final FC layer
-            in_features = self.backbone.fc.in_features
-            self.backbone.fc = nn.Linear(in_features, num_classes)
-            self.is_lightweight = False
+        # Replace final FC layer
+        in_features = self.backbone.fc.in_features
+        self.backbone.fc = nn.Linear(in_features, num_classes)
+        self.is_lightweight = False
 
         self.model_name = model_name
         self.num_classes = num_classes
