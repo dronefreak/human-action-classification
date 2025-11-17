@@ -5,7 +5,14 @@ Add this to your existing classifier.py
 """
 
 import torch.nn as nn
-from torchvision.models.video import mc3_18, r2plus1d_18, r3d_18
+from torchvision.models.video import (
+    MC3_18_Weights,
+    R2Plus1D_18_Weights,
+    R3D_18_Weights,
+    mc3_18,
+    r2plus1d_18,
+    r3d_18,
+)
 
 
 class Video3DCNN(nn.Module):
@@ -39,11 +46,14 @@ class Video3DCNN(nn.Module):
         else:
             # Standard pretrained models
             if model_name == "r3d_18":
-                self.backbone = r3d_18(pretrained=pretrained)
+                weights = R3D_18_Weights.DEFAULT if pretrained else None
+                self.backbone = r3d_18(weights=weights)
             elif model_name == "mc3_18":
-                self.backbone = mc3_18(pretrained=pretrained)
+                weights = MC3_18_Weights.DEFAULT if pretrained else None
+                self.backbone = mc3_18(weights=weights)
             elif model_name == "r2plus1d_18":
-                self.backbone = r2plus1d_18(pretrained=pretrained)
+                weights = R2Plus1D_18_Weights.DEFAULT if pretrained else None
+                self.backbone = r2plus1d_18(weights=weights)
             else:
                 raise ValueError(f"Unknown model: {model_name}")
 

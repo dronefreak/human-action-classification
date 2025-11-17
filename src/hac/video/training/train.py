@@ -323,7 +323,7 @@ def main():
     parser.add_argument(
         "--label_smoothing",
         type=float,
-        default=4,
+        default=0.1,
         help="Label smoothing value for the cross-entropy loss",
     )
     # System
