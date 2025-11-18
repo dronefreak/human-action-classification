@@ -1,21 +1,21 @@
-# Human Action Classification v2.0 🚀
+# Human Action Classification 🎬
 
-[![🐍 Python 3.9+](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white&style=for-the-badge)](https://www.python.org/downloads/)
-[![🔥 PyTorch 2.0+](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C?logo=pytorch&logoColor=white&style=for-the-badge)](https://pytorch.org/)
-[![🤗 HuggingFace Models](https://img.shields.io/badge/HuggingFace-Models-FFD21E?logo=huggingface&logoColor=yellow&style=for-the-badge)](https://huggingface.co/dronefreak/human-action-classification-stanford40)
-[![⚖️ License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-green?logo=open-source-initiative&logoColor=white&style=for-the-badge)](https://opensource.org/licenses/Apache-2.0)
-[![⭐ GitHub stars](https://img.shields.io/github/stars/dronefreak/human-action-classification?style=for-the-badge)](https://github.com/dronefreak/human-action-classification/stargazers)
+[![Python 3.9+](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white&style=for-the-badge)](https://www.python.org/)
+[![PyTorch 2.0+](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C?logo=pytorch&logoColor=white&style=for-the-badge)](https://pytorch.org/)
+[![HuggingFace](https://img.shields.io/badge/🤗%20Models-2%20Published-FFD21E?style=for-the-badge)](https://huggingface.co/dronefreak)
+[![License](https://img.shields.io/badge/License-Apache%202.0-green?style=for-the-badge)](LICENSE)
 
-**The fastest way to classify human actions in images and video.** MediaPipe pose estimation + PyTorch CNNs with **90 FPS real-time performance**. Zero C++ compilation, pure Python.
+**State-of-the-art action recognition** for both **images** and **videos**. From pose-based image classification to temporal 3D CNNs for video understanding.
 
-> **v2.0**: Complete PyTorch rewrite — **47x faster** than the original TF 1.13 version • [Legacy code →](https://github.com/dronefreak/human-action-classification/tree/legacy)
+> 🎯 **Two complete pipelines:** Single-frame pose classification (90 FPS) + Video temporal modeling (87% UCF-101)
 
 ---
 
-## 🎬 Demo
+## 🎬 What's New
 
-<!-- TODO: Add demo GIF here showing: input image → skeleton overlay → action prediction -->
-<!-- Example: ![Demo](assets/demo.gif) -->
+### Video Action Recognition (NEW!) 🔥
+
+<<<<<<< HEAD
 
 <table>
   <tr>
@@ -31,97 +31,137 @@
     </td>
   </tr>
 </table>
+=======
+- **87.05% accuracy** on UCF-101 with MC3-18
+- **3D CNN models** (R3D-18, MC3-18) for temporal understanding
+- **Published on HuggingFace:** [MC3-18](https://huggingface.co/dronefreak/mc3-18-ucf101) | [R3D-18](https://huggingface.co/dronefreak/r3d-18-ucf101)
+- Train your own with complete training pipeline
+>>>>>>> f1bf7cc (feat: Add video models working and pushed)
 
-## 🎮 Try It Now
+### Image Action Recognition
 
-```bash
-# Launch web demo in 10 seconds
-pip install -e ".[demo]" && hac-demo
-```
+- **88.5% accuracy** on Stanford40 with ResNet50
+- **90 FPS real-time** inference with MediaPipe + PyTorch
+- **Pose-aware classification** with geometric reasoning
+- Pure Python, zero C++ compilation
 
-<!-- TODO: Add these when ready
-[![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](your-colab-link)
-[![🤗 HuggingFace Space](https://img.shields.io/badge/🤗-Open%20in%20Spaces-blue)](your-space-link)
--->
+---
 
-## ⚡ Why v2.0?
+## 📊 Model Zoo
+
+<<<<<<< HEAD
 
 - ✅ **90 FPS real-time** (11ms per frame on RTX 4070 Super)
 - ✅ **Zero C++ compilation** — pure Python `pip install`
 - ✅ **100+ architectures** — swap any timm model
-- ✅ **88.5% accuracy** on Stanford40 dataset
+- # ✅ **88.5% accuracy** on Stanford40 dataset
+
+### 🎥 Video Models (Temporal - UCF-101)
+
+| Model      | Accuracy   | Params | FPS | Dataset               | Download                                                                                               |
+| ---------- | ---------- | ------ | --- | --------------------- | ------------------------------------------------------------------------------------------------------ |
+| **MC3-18** | **87.05%** | 11.7M  | 30  | UCF-101 (101 classes) | [![HF](https://img.shields.io/badge/🤗-Model-yellow)](https://huggingface.co/dronefreak/mc3-18-ucf101) |
+| **R3D-18** | **83.80%** | 33.2M  | 40  | UCF-101 (101 classes) | [![HF](https://img.shields.io/badge/🤗-Model-yellow)](https://huggingface.co/dronefreak/r3d-18-ucf101) |
+
+**Input:** 16-frame clips @ 112×112  
+**Use case:** Action classification in video clips (sports, activities, human-object interaction)
+
+> > > > > > > f1bf7cc (feat: Add video models working and pushed)
 
 <details>
-<summary>📊 Detailed Comparison: v1.0 vs v2.0</summary>
+<summary>📈 Comparison with Published Baselines</summary>
 
-| Feature                   | v1.0 (TF 1.13)                  | v2.0 (PyTorch)                  |
-| ------------------------- | ------------------------------- | ------------------------------- |
-| **Inference Speed**       | 1.4s per image                  | ~0.011s per image (127x faster) |
-| **Installation**          | SWIG + C++ compilation required | Pure Python, pip install        |
-| **Pose Estimation**       | tf-pose-estimation (OpenPose)   | MediaPipe (production-ready)    |
-| **Framework**             | TensorFlow 1.13                 | PyTorch 2.0+                    |
-| **Models**                | Fixed MobileNet/Inception       | Any timm model (100+ options)   |
-| **Dependency Management** | requirements.txt chaos          | pyproject.toml + Poetry         |
-| **API**                   | Script-based                    | Clean Python API + CLI          |
+| Method | Published | This Repo  | Improvement |
+| ------ | --------- | ---------- | ----------- |
+| R3D-18 | 82.8%     | **83.8%**  | +1.0% ✅    |
+| MC3-18 | 85.0%     | **87.05%** | +2.05% ✅   |
+
+_Our models match or exceed original papers!_
 
 </details>
 
-## Quick Start
+### 🖼️ Image Models (Pose-based - Stanford40)
+
+| Model             | Accuracy  | Speed | Dataset                 | Download                                                                                                                                                    |
+| ----------------- | --------- | ----- | ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **ResNet50**      | **88.5%** | 6ms   | Stanford40 (40 classes) | [![HF](https://img.shields.io/badge/🤗-Model-yellow)](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/resnet50)          |
+| ResNet34          | 86.4%     | 5ms   | Stanford40              | [![HF](https://img.shields.io/badge/🤗-Model-yellow)](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/resnet34)          |
+| MobileNetV3-Large | 82.1%     | 3ms   | Stanford40              | [![HF](https://img.shields.io/badge/🤗-Model-yellow)](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/mobilenetv3_large) |
+| ResNet18          | 82.3%     | 4ms   | Stanford40              | [![HF](https://img.shields.io/badge/🤗-Model-yellow)](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/resnet18)          |
+
+**Input:** Single RGB image @ 224×224  
+**Use case:** Real-time single-frame action classification (fitness, sports, daily activities)
+
+---
+
+## 🚀 Quick Start
 
 ### Installation
 
 ```bash
-# Quick start (recommended for most users)
+# Core library
+pip install -e .
+
+# With demo interface
 pip install -e ".[demo]"
 
-# Full installation with training tools
+# Full installation (training + demo)
 pip install -e ".[dev,demo,train]"
 ```
 
+### Video Action Recognition (NEW!)
+
+```python
+import torch
+from torchvision.transforms import Compose, Resize, CenterCrop, Normalize, ToTensor
+
+# Load video model
+model = torch.hub.load('dronefreak/mc3-18-ucf101', 'model', pretrained=True)
+model.eval()
+
+# Prepare 16-frame clip (C, T, H, W)
+transform = Compose([
+    Resize((128, 171)),
+    CenterCrop(112),
+    ToTensor(),
+    Normalize(mean=[0.43216, 0.394666, 0.37645],
+              std=[0.22803, 0.22145, 0.216989])
+])
+
+# Inference
+with torch.no_grad():
+    output = model(video_tensor)  # (1, 101)
+    prediction = output.argmax(dim=1)
+
+print(f"Action: {ucf101_classes[prediction]}")
+```
+
 <details>
-<summary>Using Conda? (Optional)</summary>
+<summary>📝 Video Classification CLI</summary>
 
 ```bash
-conda env create -f environment.yml
-conda activate human-action-classification
-pip install -e ".[demo]"
+# Classify video clip
+python -m hac.video.inference.predict \
+    --video clip.mp4 \
+    --model dronefreak/mc3-18-ucf101 \
+    --num_frames 16
+
+# Real-time webcam
+python -m hac.video.inference.predict \
+    --webcam \
+    --model dronefreak/mc3-18-ucf101
 ```
 
 </details>
 
-### Usage Examples
-
-#### Web Interface (Easiest)
-
-```bash
-# Launch interactive demo
-hac-demo
-
-# Or with custom model
-hac-demo --model weights/best.pth --share
-```
-
-#### Command Line
-
-```bash
-# Single image
-hac-infer --image photo.jpg --model weights/best.pth
-
-# Video processing
-hac-infer --video video.mp4 --model weights/best.pth
-
-# Real-time webcam
-hac-infer --webcam --model weights/best.pth
-```
-
-#### Python API
+### Image Action Recognition
 
 ```python
 from hac import ActionPredictor
 
-# Initialize predictor
+# Initialize with pose estimation
 predictor = ActionPredictor(
-    model_path=None,  # Uses pretrained ImageNet backbone
+    model_path=None,  # Uses pretrained ResNet50
     device='cuda',
     use_pose_estimation=True
 )
@@ -134,105 +174,77 @@ print(f"Action: {result['action']['top_class']}")
 print(f"Confidence: {result['action']['top_confidence']:.2%}")
 ```
 
-## 🎓 Training Your Own Models
-
-### Quick Training
-
-```bash
-# 1. Download Stanford40 dataset from http://vision.stanford.edu/Datasets/40actions.html
-# 2. Organize as: data/train/class1/*.jpg, data/val/class1/*.jpg
-# 3. Train
-python -m hac.training.train \
-    --data_dir data/ \
-    --model_name mobilenetv3_small_100 \
-    --num_classes 40 \
-    --epochs 50
-```
-
 <details>
-<summary>📝 Advanced Training Options</summary>
-
-### Python API
-
-```python
-from hac.training.train import Trainer
-from hac.models.classifier import create_model
-from hac.data.dataset import ActionDataset
-
-# Create model (any timm architecture)
-model = create_model(
-    model_type='action',
-    model_name='efficientnet_b0',
-    num_classes=40,
-    pretrained=True
-)
-
-# Setup datasets
-train_dataset = ActionDataset('data/', split='train')
-val_dataset = ActionDataset('data/', split='val')
-
-# Train
-trainer = Trainer(
-    model=model,
-    train_loader=train_loader,
-    val_loader=val_loader,
-    optimizer=optimizer,
-    scheduler=scheduler,
-    device='cuda',
-    output_dir='outputs/',
-    max_epochs=50
-)
-trainer.train()
-```
-
-### Custom Dataset
+<summary>🖥️ Web Demo & CLI</summary>
 
 ```bash
-# Works with any image classification dataset
-# Just organize as: data/train/your_class_1/*.jpg, data/val/your_class_1/*.jpg
-python -m hac.training.train \
-    --data_dir data/ \
-    --model_name resnet18 \
-    --num_classes YOUR_NUM_CLASSES \
-    --batch_size 32 \
-    --lr 1e-3
+# Launch interactive web demo
+hac-demo
+
+# Command line inference
+hac-infer --image photo.jpg --model weights/best.pth
+
+# Real-time webcam
+hac-infer --webcam --model weights/best.pth
 ```
 
 </details>
 
-## Architecture
+---
 
-**Dual-stream pipeline:**
+## 🎓 Training Your Own Models
 
-1. **MediaPipe Pose Detection** → Extract 33 body keypoints
-2. **Rule-based Pose Classifier** → Classify as sitting/standing/lying (simple geometric rules)
-3. **CNN Action Classifier** → Predict action from 40 classes (trained neural network)
+### Video Models (UCF-101)
 
-Models can be swapped via timm integration - test 100+ architectures without code changes.
+```bash
+# 1. Download UCF-101
+wget https://www.crcv.ucf.edu/data/UCF101/UCF101.rar
+unrar x UCF101.rar
 
-## Pretrained Models
+# 2. Download official splits
+wget https://www.crcv.ucf.edu/data/UCF101/UCF101TrainTestSplits-RecognitionTask.zip
+unzip UCF101TrainTestSplits-RecognitionTask.zip
 
-| Model                 | Accuracy  | Speed (RTX 4070) | Best For      | Download                                                                                                                                                                                           |
-| --------------------- | --------- | ---------------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **ResNet50**          | **88.5%** | 6ms              | Best Accuracy | [![🤗](https://img.shields.io/badge/↓-HuggingFace-FFD21E?logo=huggingface&logoColor=yellow)](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/resnet50)          |
-| ResNet34              | 86.4%     | 5ms              | Balanced      | [![🤗](https://img.shields.io/badge/↓-HuggingFace-FFD21E?logo=huggingface&logoColor=yellow)](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/resnet34)          |
-| **MobileNetV3-Large** | **82.1%** | **3ms**          | Edge/Mobile   | [![🤗](https://img.shields.io/badge/↓-HuggingFace-FFD21E?logo=huggingface&logoColor=yellow)](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/mobilenetv3_large) |
-| ResNet18              | 82.3%     | 4ms              | Fast          | [![🤗](https://img.shields.io/badge/↓-HuggingFace-FFD21E?logo=huggingface&logoColor=yellow)](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/resnet18)          |
-| MobileNetV3-Small     | 74.4%     | 2ms              | Ultra-Fast    | [![🤗](https://img.shields.io/badge/↓-HuggingFace-FFD21E?logo=huggingface&logoColor=yellow)](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/mobilenetv3_small) |
+# 3. Organize dataset
+python scripts/split_ucf101.py \
+    --source UCF-101/ \
+    --output UCF-101-organized/ \
+    --splits ucfTrainTestlist/ \
+    --split_num 1
 
-> All models trained on **Stanford40 Actions** (40 classes) • Licensed under [Apache 2.0](https://opensource.org/licenses/Apache-2.0)
+# 4. Train MC3-18
+python -m hac.video.training.train \
+    --data_dir UCF-101-organized/ \
+    --model mc3_18 \
+    --pretrained \
+    --batch_size 32 \
+    --epochs 200 \
+    --output_dir outputs/mc3-18
+```
+
+**Expected results:**
+
+- MC3-18: 87% accuracy (200 epochs, 6-7 hours on RTX 4070 Super)
+- R3D-18: 84% accuracy (100 epochs, 3-4 hours)
 
 <details>
-<summary>Full Metrics Table (Precision, Recall, F1)</summary>
+<summary>📝 Advanced Video Training</summary>
 
-| Model             | Accuracy | Macro Precision | Macro Recall | Macro F1 | Weighted F1 |
-| ----------------- | -------- | --------------- | ------------ | -------- | ----------- |
-| ResNet50          | 88.5%    | 0.887           | 0.885        | 0.884    | 0.884       |
-| ResNet34          | 86.4%    | 0.869           | 0.864        | 0.862    | 0.862       |
-| ResNet18          | 82.3%    | 0.821           | 0.823        | 0.818    | 0.818       |
-| MobileNetV3-Large | 82.1%    | 0.822           | 0.821        | 0.817    | 0.817       |
-| MobileNetV3-Small | 74.4%    | 0.738           | 0.744        | 0.735    | 0.735       |
+````bash
+# With augmentations
+python -m hac.video.training.train \
+    --data_dir UCF-101-organized/ \
+    --model mc3_18 \
+    --pretrained \
+    --batch_size 32 \
+    --epochs 200 \
+    --lr 0.001 \
+    --weight_decay 1e-4 \
+    --mixup_alpha 0.2 \
+    --cutmix_alpha 0.5 \
+    --label_smoothing 0.1
 
+<<<<<<< HEAD
 </details>
 
 ### Use Any Model via timm
@@ -249,7 +261,7 @@ create_model('convnext_tiny', num_classes=40)
 # Heavy (maximum accuracy)
 create_model('efficientnet_b4', num_classes=40)
 create_model('convnext_base', num_classes=40)
-```
+````
 
 > [View all 100+ available models →](timm_model_families.md)
 
@@ -310,170 +322,262 @@ if action in ['running', 'walking'] and confidence > 0.8:
 elif action in ['looking_through_a_telescope', 'texting_message']:
     # Distracted pedestrian
     vehicle.monitor_closely()
+=======
+# Try different models
+--model r3d_18      # 83.8% accuracy
+--model r2plus1d_18 # Alternative architecture
+--model mc3_18      # 87% accuracy (best)
+>>>>>>> f1bf7cc (feat: Add video models working and pushed)
 ```
 
 </details>
 
-<details>
-<summary>Code Example: Export for Edge Devices</summary>
+### Image Models (Stanford40)
 
-```python
-from hac.models.classifier import create_model
-import torch
+```bash
+# 1. Download Stanford40 dataset
+# From: http://vision.stanford.edu/Datasets/40actions.html
 
-# Create lightweight model
-model = create_model('mobilenetv3_small_100', num_classes=40)
-model.load_state_dict(torch.load('weights/best.pth'))
-model.eval()
-
-# Export to ONNX for Jetson/mobile
-dummy_input = torch.randn(1, 3, 224, 224)
-torch.onnx.export(
-    model,
-    dummy_input,
-    'model.onnx',
-    input_names=['image'],
-    output_names=['action'],
-    dynamic_axes={'image': {0: 'batch'}}
-)
+# 2. Train
+python -m hac.training.train \
+    --data_dir data/ \
+    --model_name resnet50 \
+    --num_classes 40 \
+    --epochs 50 \
+    --batch_size 32
 ```
-
-</details>
 
 ---
 
-<details>
-<summary>Migrating from v1.0?</summary>
+## 🏗️ Architecture
 
-### Quick Migration Guide
+### Video Pipeline (3D CNN)
 
-```python
-# Old (v1.0 - TF 1.13)
-from tf_pose.estimator import TfPoseEstimator
-estimator = TfPoseEstimator(...)
-humans = estimator.inference(image)
-
-# New (v2.0 - PyTorch)
-from hac import ActionPredictor
-predictor = ActionPredictor()
-result = predictor.predict_image(image)
+```
+Video Clip (16 frames)
+    ↓
+Frame Preprocessing (112×112)
+    ↓
+3D CNN (MC3-18 / R3D-18)
+    ↓
+Temporal Convolutions
+    ↓
+Action Classification (101 classes)
 ```
 
-**Key Changes:**
+**Key features:**
 
-- ✅ No more SWIG/C++ compilation
-- ✅ 127x faster inference
-- ✅ Simpler API with `pip install`
-- ✅ Models via HuggingFace Hub
+- Spatiotemporal convolutions
+- Temporal modeling across 16 frames
+- Pretrained on Kinetics-400
+- Fine-tuned on UCF-101
 
-See [legacy branch](https://github.com/dronefreak/human-action-classification/tree/legacy) for v1.0 code.
+### Image Pipeline (Pose + 2D CNN)
 
-</details>
-
-<details>
-<summary>Performance Optimization Tips</summary>
-
-### Speed Up Inference
-
-```python
-# 1. Use GPU (4-5x faster)
-predictor = ActionPredictor(device='cuda')
-
-# 2. Disable pose detection if not needed
-predictor = ActionPredictor(use_pose_estimation=False)
-
-# 3. Use lighter models for real-time
-model = create_model('mobilenetv3_small_100', num_classes=40)  # <10ms
-
-# 4. Batch processing for videos
-results = [predictor.predict_image(frame) for frame in frames]
-
-# 5. Export to TorchScript for production
-model.eval()
-traced = torch.jit.trace(model, example_input)
-traced.save('model_traced.pt')
+```
+Image
+    ↓
+MediaPipe Pose Detection → 33 keypoints
+    ↓
+Pose Classifier → sitting/standing/lying
+    ↓
+2D CNN (ResNet50) → Action features
+    ↓
+Action Classification (40 classes)
 ```
 
-### Memory Optimization
+**Key features:**
 
-- Use MobileNet models for edge devices
-- Reduce input resolution if accuracy allows
-- Enable mixed precision training with `torch.cuda.amp`
-
-</details>
+- Dual-stream: pose + appearance
+- Real-time 90 FPS inference
+- Geometric pose reasoning
+- Any timm model backbone
 
 ---
 
-## Roadmap
+## 📈 Performance Benchmarks
 
-**Completed**
+### Video Models (NVIDIA RTX 4070 Super)
 
-- Core inference pipeline with MediaPipe + PyTorch
-- Training scripts with modern PyTorch trainer
-- CLI tools and Gradio web demo
-- Pretrained weights on HuggingFace Hub
-- Support for 100+ model architectures via timm
+| Model  | Inference Time | FPS | Batch Size |
+| ------ | -------------- | --- | ---------- |
+| MC3-18 | 33ms           | 30  | 1          |
+| R3D-18 | 25ms           | 40  | 1          |
 
-**In Progress**
+### Image Models (NVIDIA RTX 4070 Super)
 
-- ONNX export utilities
-- TensorRT optimization guides
-- Example Jupyter notebooks
+| Pipeline Stage | Time     | FPS    |
+| -------------- | -------- | ------ |
+| MediaPipe Pose | 5ms      | -      |
+| ResNet50 CNN   | 6ms      | -      |
+| **Total**      | **11ms** | **90** |
 
-**Planned**
+> **Comparison:** v1.0 (TF 1.13 + OpenPose) = 1400ms → v2.0 (PyTorch + MediaPipe) = 11ms (**127× faster**)
 
-- HuggingFace Spaces demo
-- Google Colab notebook
-- Mobile deployment guides (iOS/Android)
-- Raspberry Pi benchmarks
+---
 
-## Contributing
+## 🎯 Use Cases
 
-**High-impact contributions wanted:**
+### Video Understanding
 
-- [ ] **HuggingFace Space demo** — Deploy interactive web demo
-- [ ] **Colab notebook** — One-click demo for users
-- [ ] **Mobile benchmarks** — Test on iOS/Android devices
-- [ ] **Raspberry Pi guide** — Edge deployment tutorial
-- [ ] **ROS2 integration** — Robotics/AV integration example
-- [ ] **Additional datasets** — Train on Kinetics/UCF-101
-- [ ] **Video demo GIF** — Show real-time inference
+- **Sports analysis** - Classify basketball, soccer, swimming actions
+- **Surveillance** - Detect abnormal behavior in videos
+- **Fitness tracking** - Recognize workout exercises
+- **Content moderation** - Auto-tag video content
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions.
+### Real-time Image Classification
 
-**Have other ideas?** Open an issue or PR!
+- **Fitness coaching** - Analyze workout form
+- **Healthcare** - Fall detection, mobility monitoring
+- **Autonomous vehicles** - Pedestrian intent prediction
+- **Gaming/VR** - Body-based game controls
 
-## Citation
+---
+
+## 🔬 Datasets
+
+### Supported Datasets
+
+| Dataset        | Classes | Videos | Use Case         | Models Available       |
+| -------------- | ------- | ------ | ---------------- | ---------------------- |
+| **UCF-101**    | 101     | 13,320 | Video temporal   | MC3-18, R3D-18 ✅      |
+| **Stanford40** | 40      | 9,532  | Image pose-based | ResNet50, MobileNet ✅ |
+| Kinetics-400   | 400     | 306K   | Pretraining      | -                      |
+
+### UCF-101 Classes
+
+101 human actions including:
+
+- **Sports:** Basketball, Soccer, Swimming, Tennis, Volleyball
+- **Music:** Playing Drums, Guitar, Piano, Violin
+- **Activities:** Cooking, Gardening, Typing, Writing
+- **Body motion:** Walking, Running, Jumping, Lunging
+
+[Full list →](https://www.crcv.ucf.edu/data/UCF101.php)
+
+### Stanford40 Classes
+
+40 common human activities:
+
+- applauding, climbing, cooking, cutting_trees, drinking
+- fishing, gardening, playing_guitar, pouring_liquid, etc.
+
+[Full list →](http://vision.stanford.edu/Datasets/40actions.html)
+
+---
+
+## 📚 Documentation
+
+- [Model Zoo](timm_model_families.md) - All available models
+- [Deployement](DEPLOYMENT.md) - Deployement documentation
+- [Contributing](CONTRIBUTING.md) - How to contribute
+
+---
+
+## 🗺️ Roadmap
+
+### ✅ Completed
+
+- [x] Image classification with pose estimation
+- [x] Video classification with 3D CNNs
+- [x] Published models on HuggingFace
+- [x] Training pipelines for both modalities
+- [x] CLI and Python API
+- [x] Web demo with Gradio
+
+### 🚧 In Progress
+
+- [ ] Two-stream fusion (spatial + temporal)
+- [ ] Real-time video demo
+- [ ] HuggingFace Spaces deployment
+- [ ] ONNX export for production
+
+### 📋 Planned
+
+- [ ] Mobile deployment guides
+- [ ] TensorRT optimization
+- [ ] Additional datasets (Kinetics, AVA)
+- [ ] Multi-person action detection
+- [ ] Action localization in videos
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! High-impact areas:
+
+- **🎥 Video demos** - Create GIFs/videos showing real-time inference
+- **📱 Mobile deployment** - iOS/Android guides
+- **🚀 Model improvements** - Train on Kinetics, optimize architectures
+- **📖 Documentation** - Tutorials, examples, notebooks
+- **🐛 Bug fixes** - Always appreciated!
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup and guidelines.
+
+---
+
+## 📄 Citation
 
 If you use this work, please cite:
 
 ```bibtex
 @software{saksena2025hac,
   author = {Saksena, Saumya Kumaar},
-  title = {Human Action Classification v2.0},
+  title = {Human Action Classification: Image and Video Understanding},
   year = {2025},
   url = {https://github.com/dronefreak/human-action-classification}
 }
 ```
 
-Original v1.0 references:
+### Model Citations
 
-- OpenPose: [Arxiv](https://arxiv.org/abs/1812.08008)
-- Stanford 40 Actions: [Dataset](http://vision.stanford.edu/Datasets/40actions.html)
+**Video Models (MC3-18, R3D-18):**
 
-## License
+```bibtex
+@inproceedings{tran2018closer,
+  title={A closer look at spatiotemporal convolutions for action recognition},
+  author={Tran, Du and Wang, Heng and Torresani, Lorenzo and Ray, Jamie and LeCun, Yann and Paluri, Manohar},
+  booktitle={CVPR},
+  year={2018}
+}
+```
 
-Apache License - see [LICENSE](../LICENSE) file for details.
+**Datasets:**
 
-## Acknowledgments
-
-- **MediaPipe**: Google's pose estimation
-- **timm**: Ross Wightman's model library
-- **Stanford 40**: Dataset creators
-- **Original repo users**: 233+ stars and counting!
+- UCF-101: [Paper](https://arxiv.org/abs/1212.0402)
+- Stanford40: [Website](http://vision.stanford.edu/Datasets/40actions.html)
 
 ---
 
-**Author**: Saumya Kumaar Saksena
-**Contact**: [GitHub](https://github.com/dronefreak)
-**Original Repo**: [human-action-classification](https://github.com/dronefreak/human-action-classification)
+## 🙏 Acknowledgments
+
+- **MediaPipe** - Google's pose estimation framework
+- **timm** - Ross Wightman's model library
+- **PyTorch** - Deep learning framework
+- **UCF-101 & Stanford40** - Dataset creators
+- **Original repo contributors** - 233+ stars!
+
+---
+
+## 📧 Contact
+
+**Author:** Saumya Kumaar Saksena  
+**GitHub:** [@dronefreak](https://github.com/dronefreak)  
+**Models:** [HuggingFace](https://huggingface.co/dronefreak)
+
+---
+
+## 📜 License
+
+Apache License 2.0 - See [LICENSE](LICENSE) for details.
+
+---
+
+<div align="center">
+
+**⭐ Star this repo if it helped you!**
+
+[![GitHub stars](https://img.shields.io/github/stars/dronefreak/human-action-classification?style=social)](https://github.com/dronefreak/human-action-classification)
+[![GitHub forks](https://img.shields.io/github/forks/dronefreak/human-action-classification?style=social)](https://github.com/dronefreak/human-action-classification/fork)
+
+</div>
