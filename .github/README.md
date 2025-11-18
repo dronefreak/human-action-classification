@@ -22,12 +22,12 @@
     <td align="center">
       <img src="../assets/gardening.jpg" width="280"/><br/>
       <b>Gardening</b><br/>
-      Confidence: 94%
+      <!-- Confidence: 94% -->
     </td>
     <td align="center">
       <img src="../assets/looking_through_a_telescope.jpg" width="280"/><br/>
-      <b>Using Telescope</b><br/>
-      Confidence: 91%
+      <b>Looking Through a Telescope</b><br/>
+      <!-- Confidence: 91% -->
     </td>
   </tr>
 </table>
@@ -46,11 +46,10 @@ pip install -e ".[demo]" && hac-demo
 
 ## ⚡ Why v2.0?
 
-✅ **90 FPS real-time** (11ms per frame on RTX 4070 Super)  
-✅ **Zero C++ compilation** — pure Python `pip install`  
-✅ **100+ architectures** — swap any timm model  
-✅ **Production ready** — MediaPipe + PyTorch 2.0  
-✅ **88.5% accuracy** on Stanford40 dataset
+- ✅ **90 FPS real-time** (11ms per frame on RTX 4070 Super)
+- ✅ **Zero C++ compilation** — pure Python `pip install`
+- ✅ **100+ architectures** — swap any timm model
+- ✅ **88.5% accuracy** on Stanford40 dataset
 
 <details>
 <summary>📊 Detailed Comparison: v1.0 vs v2.0</summary>
@@ -281,11 +280,11 @@ create_model('convnext_base', num_classes=40)
 
 ## Real-World Applications
 
-**Fitness & Sports** — Analyze workout form, track exercise reps, coach technique  
-**Autonomous Vehicles** — Predict pedestrian crossing intent, detect distracted behavior  
-**Healthcare** — Fall detection for elderly care, patient mobility monitoring  
-**Gaming & VR** — Control games with body movements, motion capture  
-**Workplace Safety** — Detect unsafe working postures, PPE compliance  
+**Fitness & Sports** — Analyze workout form, track exercise reps, coach technique
+**Autonomous Vehicles** — Predict pedestrian crossing intent, detect distracted behavior
+**Healthcare** — Fall detection for elderly care, patient mobility monitoring
+**Gaming & VR** — Control games with body movements, motion capture
+**Workplace Safety** — Detect unsafe working postures, PPE compliance
 **Content Creation** — Auto-tag video content, generate highlights, behavior analytics
 
 <details>

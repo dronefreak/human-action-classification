@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "human-action-classification"
 version = "2.0.0"
 description = "Modern human action classification using MediaPipe pose estimation and deep learning"
-authors = [{name = "Saumya Kumaar Saksena", email = "your.email@example.com"}]
+authors = [{name = "Saumya Kumaar Saksena", email = "kumaar324@gmail.com"}]
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "Apache"}
