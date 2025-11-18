@@ -15,28 +15,10 @@
 
 ### Video Action Recognition (NEW!) 🔥
 
-<<<<<<< HEAD
-
-<table>
-  <tr>
-    <td align="center">
-      <img src="../assets/gardening.jpg" width="280"/><br/>
-      <b>Gardening</b><br/>
-      <!-- Confidence: 94% -->
-    </td>
-    <td align="center">
-      <img src="../assets/looking_through_a_telescope.jpg" width="280"/><br/>
-      <b>Looking Through a Telescope</b><br/>
-      <!-- Confidence: 91% -->
-    </td>
-  </tr>
-</table>
-=======
 - **87.05% accuracy** on UCF-101 with MC3-18
 - **3D CNN models** (R3D-18, MC3-18) for temporal understanding
 - **Published on HuggingFace:** [MC3-18](https://huggingface.co/dronefreak/mc3-18-ucf101) | [R3D-18](https://huggingface.co/dronefreak/r3d-18-ucf101)
 - Train your own with complete training pipeline
->>>>>>> f1bf7cc (feat: Add video models working and pushed)
 
 ### Image Action Recognition
 
@@ -49,13 +31,6 @@
 
 ## 📊 Model Zoo
 
-<<<<<<< HEAD
-
-- ✅ **90 FPS real-time** (11ms per frame on RTX 4070 Super)
-- ✅ **Zero C++ compilation** — pure Python `pip install`
-- ✅ **100+ architectures** — swap any timm model
-- # ✅ **88.5% accuracy** on Stanford40 dataset
-
 ### 🎥 Video Models (Temporal - UCF-101)
 
 | Model      | Accuracy   | Params | FPS | Dataset               | Download                                                                                               |
@@ -65,8 +40,6 @@
 
 **Input:** 16-frame clips @ 112×112  
 **Use case:** Action classification in video clips (sports, activities, human-object interaction)
-
-> > > > > > > f1bf7cc (feat: Add video models working and pushed)
 
 <details>
 <summary>📈 Comparison with Published Baselines</summary>
@@ -230,7 +203,7 @@ python -m hac.video.training.train \
 <details>
 <summary>📝 Advanced Video Training</summary>
 
-````bash
+```bash
 # With augmentations
 python -m hac.video.training.train \
     --data_dir UCF-101-organized/ \
@@ -244,90 +217,10 @@ python -m hac.video.training.train \
     --cutmix_alpha 0.5 \
     --label_smoothing 0.1
 
-<<<<<<< HEAD
-</details>
-
-### Use Any Model via timm
-
-```python
-# Lightweight (mobile/edge)
-create_model('mobilenetv3_small_100', num_classes=40)
-create_model('efficientnet_lite0', num_classes=40)
-
-# Balanced (recommended)
-create_model('efficientnet_b0', num_classes=40)
-create_model('convnext_tiny', num_classes=40)
-
-# Heavy (maximum accuracy)
-create_model('efficientnet_b4', num_classes=40)
-create_model('convnext_base', num_classes=40)
-````
-
-> [View all 100+ available models →](timm_model_families.md)
-
-## Performance Benchmarks
-
-**NVIDIA RTX 4070 Super (Latest):**
-| Stage | Time | FPS |
-|-------|------|-----|
-| Pose Detection (MediaPipe) | ~5ms | - |
-| Action Classification | ~6ms | - |
-| **Total Pipeline** | **~11ms** | **90 FPS** |
-
-**NVIDIA GTX 1050 Ti (Legacy):**
-| Stage | Time | FPS |
-|-------|------|-----|
-| Pose Detection | ~20ms | - |
-| Action Classification | ~10ms | - |
-| **Total Pipeline** | **~30ms** | **33 FPS** |
-
-**v1.0 (TF 1.13 + OpenPose) - GTX 1050 Ti:**
-| Stage | Time |
-|-------|------|
-| Pose Detection (OpenPose) | ~800ms |
-| Action Classification | ~200ms |
-| **Total Pipeline** | **~1400ms (0.7 FPS)** |
-
-> **Result:** v2.0 is **47x faster** on same hardware, **127x faster** on modern GPUs
-
-## Real-World Applications
-
-**Fitness & Sports** — Analyze workout form, track exercise reps, coach technique
-**Autonomous Vehicles** — Predict pedestrian crossing intent, detect distracted behavior
-**Healthcare** — Fall detection for elderly care, patient mobility monitoring
-**Gaming & VR** — Control games with body movements, motion capture
-**Workplace Safety** — Detect unsafe working postures, PPE compliance
-**Content Creation** — Auto-tag video content, generate highlights, behavior analytics
-
-<details>
-<summary>Code Example: Pedestrian Intent Detection</summary>
-
-```python
-from hac import ActionPredictor
-
-predictor = ActionPredictor(device='cuda')
-
-# Analyze pedestrian behavior near crosswalk
-result = predictor.predict_image(pedestrian_crop)
-action = result['action']['top_class']
-confidence = result['action']['top_confidence']
-
-# High-risk actions
-if action in ['running', 'walking'] and confidence > 0.8:
-    # Pedestrian likely to cross
-    vehicle.alert_driver()
-    vehicle.reduce_speed()
-
-# Medium-risk actions
-elif action in ['looking_through_a_telescope', 'texting_message']:
-    # Distracted pedestrian
-    vehicle.monitor_closely()
-=======
 # Try different models
 --model r3d_18      # 83.8% accuracy
 --model r2plus1d_18 # Alternative architecture
 --model mc3_18      # 87% accuracy (best)
->>>>>>> f1bf7cc (feat: Add video models working and pushed)
 ```
 
 </details>
@@ -339,7 +232,7 @@ elif action in ['looking_through_a_telescope', 'texting_message']:
 # From: http://vision.stanford.edu/Datasets/40actions.html
 
 # 2. Train
-python -m hac.training.train \
+python -m hac.image.training.train \
     --data_dir data/ \
     --model_name resnet50 \
     --num_classes 40 \
