@@ -1,0 +1,1 @@
+"""Video action recognition module."""

@@ -12,9 +12,9 @@ from torch.optim.lr_scheduler import CosineAnnealingLR
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from hac.data.dataset import ActionDataset
-from hac.models.classifier import create_model
-from hac.utils.transforms import get_inference_transforms, get_training_transforms
+from hac.common.transforms import get_inference_transforms, get_training_transforms
+from hac.image.data.dataset import ActionDataset
+from hac.image.models.classifier import create_model
 
 
 def convert_to_safetensors(checkpoint_path: str, output_path: str = None) -> str:
@@ -413,6 +413,8 @@ class Trainer:
 def main():
     parser = argparse.ArgumentParser(description="Train action classifier")
     parser.add_argument("--data_dir", type=str, required=True, help="Path to dataset")
+    parser.add_argument("--train_split", type=str, default="train")
+    parser.add_argument("--test_split", type=str, default="test")
     parser.add_argument("--model_name", type=str, default="mobilenetv3_small_100")
     parser.add_argument("--num_classes", type=int, default=40)
     parser.add_argument("--batch_size", type=int, default=32)
@@ -448,11 +450,15 @@ def main():
 
     # Create datasets
     train_dataset = ActionDataset(
-        root_dir=args.data_dir, split="train", transform=get_training_transforms()
+        root_dir=args.data_dir,
+        split=args.train_split,
+        transform=get_training_transforms(),
     )
 
     val_dataset = ActionDataset(
-        root_dir=args.data_dir, split="val", transform=get_inference_transforms()
+        root_dir=args.data_dir,
+        split=args.test_split,
+        transform=get_inference_transforms(),
     )
 
     # Create data loaders
@@ -538,9 +544,11 @@ def main():
         subprocess.run(
             [
                 "python",
-                "evaluate.py",
+                "src/hac/image/inference/evaluate.py",
                 "--checkpoint",
                 f"{args.output_dir}/best.pth",
+                "--split",
+                args.test_split,
                 "--data_dir",
                 args.data_dir,
                 "--output_dir",

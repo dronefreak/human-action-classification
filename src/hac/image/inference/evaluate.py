@@ -18,9 +18,9 @@ import yaml
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
-from hac.data.dataset import ActionDataset
-from hac.models.classifier import create_model
-from hac.utils.transforms import get_inference_transforms
+from hac.common.transforms import get_inference_transforms
+from hac.image.data.dataset import ActionDataset
+from hac.image.models.classifier import create_model
 
 
 def load_model_from_checkpoint(checkpoint_path: str, device: str = "cuda"):

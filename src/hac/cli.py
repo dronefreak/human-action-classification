@@ -3,7 +3,7 @@
 import argparse
 import sys
 
-from hac.inference.predictor import ActionPredictor
+from hac.image.inference.predictor import ActionPredictor
 
 
 def infer():
