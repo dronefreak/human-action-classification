@@ -55,15 +55,15 @@ class Video3DCNN(nn.Module):
         # Replace final FC layer
         if hasattr(self.backbone, "fc"):
             # ResNet-style 3D CNNs
-            in_features = self.backbone.fc.in_features
-            self.backbone.fc = nn.Linear(in_features, num_classes)
+            features = self.backbone.fc.in_features
+            self.backbone.fc = nn.Linear(features, num_classes)
         elif hasattr(self.backbone, "head"):
             # MViT models
-            in_features = self.backbone.head.in_features
-            self.backbone.head = nn.Linear(in_features, num_classes)
+            features = self.backbone.head.in_features
+            self.backbone.head = nn.Linear(features, num_classes)
         else:
             raise ValueError("Unknown classifier head structure")
-        self.backbone.fc = nn.Linear(in_features, num_classes)
+        self.backbone.fc = nn.Linear(features, num_classes)
         self.is_lightweight = False
 
         self.model_name = model_name
