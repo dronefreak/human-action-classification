@@ -7,7 +7,7 @@
 
 **State-of-the-art action recognition** for both **images** and **videos**. From pose-based image classification to temporal 3D CNNs for video understanding.
 
-![Demo](docs/demo.gif)
+![Demo](../docs/demo.gif)
 
 > 🎯 **Two complete pipelines:** Single-frame pose classification (90 FPS) + Video temporal modeling (87% UCF-101)
 
