@@ -59,8 +59,8 @@ class Video3DCNN(nn.Module):
             self.backbone.fc = nn.Linear(in_features, num_classes)
         elif hasattr(self.backbone, "head"):
             # MViT models
-            in_features = self.backbone.head.proj.in_features
-            self.backbone.head.proj = nn.Linear(in_features, num_classes)
+            in_features = self.backbone.head.in_features
+            self.backbone.head = nn.Linear(in_features, num_classes)
         else:
             raise ValueError("Unknown classifier head structure")
         self.backbone.fc = nn.Linear(in_features, num_classes)
