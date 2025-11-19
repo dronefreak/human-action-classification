@@ -65,10 +65,32 @@ class Video3DCNN(nn.Module):
             "swin3d_s",
             "swin3d_b",
         ]:
-            # Transformer-based video models in torchvision 0.23+
-            # Classifier is always the 'head' Linear layer
-            features = self.backbone.head.in_features
-            self.backbone.head = nn.Linear(features, num_classes)
+            # Transformer-based video models
+            # Head structure varies by model and torchvision version:
+            # - Some have: Sequential(Dropout, Linear)
+            # - Some have: Linear directly
+
+            if isinstance(self.backbone.head, nn.Sequential):
+                # Head is Sequential - extract features from last Linear layer
+                last_layer = list(self.backbone.head.children())[-1]
+                if isinstance(last_layer, nn.Linear):
+                    features = last_layer.in_features
+                else:
+                    raise ValueError(
+                        f"Expected Linear layer in head, got {type(last_layer)}"
+                    )
+                # Replace entire Sequential with single Linear
+                self.backbone.head = nn.Linear(features, num_classes)
+
+            elif isinstance(self.backbone.head, nn.Linear):
+                # Head is directly a Linear layer (like Swin3D in torchvision 0.23+)
+                features = self.backbone.head.in_features
+                self.backbone.head = nn.Linear(features, num_classes)
+
+            else:
+                raise ValueError(
+                    f"Unexpected head type for {model_name}: {type(self.backbone.head)}"
+                )
 
         else:
             raise ValueError(f"Unknown classifier type for model {model_name}")
