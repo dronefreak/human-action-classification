@@ -52,17 +52,27 @@ class Video3DCNN(nn.Module):
         weights = weight_class.DEFAULT if pretrained else None
         self.backbone = constructor(weights=weights)
 
-        # Replace final FC layer
-        if hasattr(self.backbone, "fc"):
-            # ResNet-style 3D CNNs
+        # Determine classifier field based on model type
+        if model_name in ["r3d_18", "mc3_18", "r2plus1d_18"]:
+            # ResNet3D family
             features = self.backbone.fc.in_features
             self.backbone.fc = nn.Linear(features, num_classes)
-        elif hasattr(self.backbone, "head"):
-            # MViT models
+
+        elif model_name in [
+            "mvit_v1_b",
+            "mvit_v2_s",
+            "swin3d_t",
+            "swin3d_s",
+            "swin3d_b",
+        ]:
+            # Transformer-based video models in torchvision 0.23+
+            # Classifier is always the 'head' Linear layer
             features = self.backbone.head.in_features
             self.backbone.head = nn.Linear(features, num_classes)
+
         else:
-            raise ValueError("Unknown classifier head structure")
+            raise ValueError(f"Unknown classifier type for model {model_name}")
+
         self.is_lightweight = False
 
         self.model_name = model_name
