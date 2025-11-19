@@ -63,7 +63,6 @@ class Video3DCNN(nn.Module):
             self.backbone.head = nn.Linear(features, num_classes)
         else:
             raise ValueError("Unknown classifier head structure")
-        self.backbone.fc = nn.Linear(features, num_classes)
         self.is_lightweight = False
 
         self.model_name = model_name
