@@ -271,11 +271,11 @@ def main():
             "r3d_18",
             "mc3_18",
             "r2plus1d_18",
-            "tiny_c3d",
-            "r3d_10",
-            "r3d_8",
-            "r3d_6",
-            "r3d_4",
+            "mvit_v1_s",
+            "mvit_v1_b",
+            "swin3d_t",
+            "swin3d_s",
+            "swin3d_b",
         ],
         help="3D CNN model",
     )
@@ -340,12 +340,13 @@ def main():
     print(f"Using device: {device}")
 
     # Transforms
-
     train_transform = transforms.Compose(
         [
             transforms.ToPILImage(),
-            transforms.Resize((128, 171)),
-            transforms.RandomCrop(112),
+            transforms.Resize(
+                (int(args.spatial_size * 1.14), int(args.spatial_size * 1.52))
+            ),  # Resize with aspect ratio
+            transforms.RandomCrop(args.spatial_size),  # Use spatial_size argument
             transforms.RandomHorizontalFlip(p=0.5),
             transforms.ColorJitter(
                 brightness=0.4, contrast=0.4, saturation=0.4, hue=0.1
@@ -361,7 +362,9 @@ def main():
     val_transform = transforms.Compose(
         [
             transforms.ToPILImage(),
-            transforms.Resize((128, 171)),
+            transforms.Resize(
+                (int(args.spatial_size * 1.14), int(args.spatial_size * 1.52))
+            ),  # Resize with aspect ratio
             transforms.CenterCrop(args.spatial_size),
             transforms.ToTensor(),
             transforms.Normalize(

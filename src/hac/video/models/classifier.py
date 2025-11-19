@@ -52,9 +52,49 @@ class Video3DCNN(nn.Module):
         weights = weight_class.DEFAULT if pretrained else None
         self.backbone = constructor(weights=weights)
 
-        # Replace final FC layer
-        in_features = self.backbone.fc.in_features
-        self.backbone.fc = nn.Linear(in_features, num_classes)
+        # Determine classifier field based on model type
+        if model_name in ["r3d_18", "mc3_18", "r2plus1d_18"]:
+            # ResNet3D family
+            features = self.backbone.fc.in_features
+            self.backbone.fc = nn.Linear(features, num_classes)
+
+        elif model_name in [
+            "mvit_v1_b",
+            "mvit_v2_s",
+            "swin3d_t",
+            "swin3d_s",
+            "swin3d_b",
+        ]:
+            # Transformer-based video models
+            # Head structure varies by model and torchvision version:
+            # - Some have: Sequential(Dropout, Linear)
+            # - Some have: Linear directly
+
+            if isinstance(self.backbone.head, nn.Sequential):
+                # Head is Sequential - extract features from last Linear layer
+                last_layer = list(self.backbone.head.children())[-1]
+                if isinstance(last_layer, nn.Linear):
+                    features = last_layer.in_features
+                else:
+                    raise ValueError(
+                        f"Expected Linear layer in head, got {type(last_layer)}"
+                    )
+                # Replace entire Sequential with single Linear
+                self.backbone.head = nn.Linear(features, num_classes)
+
+            elif isinstance(self.backbone.head, nn.Linear):
+                # Head is directly a Linear layer (like Swin3D in torchvision 0.23+)
+                features = self.backbone.head.in_features
+                self.backbone.head = nn.Linear(features, num_classes)
+
+            else:
+                raise ValueError(
+                    f"Unexpected head type for {model_name}: {type(self.backbone.head)}"
+                )
+
+        else:
+            raise ValueError(f"Unknown classifier type for model {model_name}")
+
         self.is_lightweight = False
 
         self.model_name = model_name
