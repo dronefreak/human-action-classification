@@ -7,6 +7,8 @@
 
 **State-of-the-art action recognition** for both **images** and **videos**. From pose-based image classification to temporal 3D CNNs for video understanding.
 
+![Demo](docs/demo.gif)
+
 > 🎯 **Two complete pipelines:** Single-frame pose classification (90 FPS) + Video temporal modeling (87% UCF-101)
 
 ---
@@ -25,7 +27,7 @@
 - **88.5% accuracy** on Stanford40 with ResNet50
 - **90 FPS real-time** inference with MediaPipe + PyTorch
 - **Pose-aware classification** with geometric reasoning
-- Pure Python, zero C++ compilation
+- **Published on HuggingFace:** [ResNet50](https://huggingface.co/dronefreak/human-action-classification-stanford40)
 
 ---
 
@@ -38,7 +40,7 @@
 | **MC3-18** | **87.05%** | 11.7M  | 30  | UCF-101 (101 classes) | [![HF](https://img.shields.io/badge/🤗-Model-yellow)](https://huggingface.co/dronefreak/mc3-18-ucf101) |
 | **R3D-18** | **83.80%** | 33.2M  | 40  | UCF-101 (101 classes) | [![HF](https://img.shields.io/badge/🤗-Model-yellow)](https://huggingface.co/dronefreak/r3d-18-ucf101) |
 
-**Input:** 16-frame clips @ 112×112  
+**Input:** 16-frame clips @ 112×112
 **Use case:** Action classification in video clips (sports, activities, human-object interaction)
 
 <details>
@@ -62,7 +64,7 @@ _Our models match or exceed original papers!_
 | MobileNetV3-Large | 82.1%     | 3ms   | Stanford40              | [![HF](https://img.shields.io/badge/🤗-Model-yellow)](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/mobilenetv3_large) |
 | ResNet18          | 82.3%     | 4ms   | Stanford40              | [![HF](https://img.shields.io/badge/🤗-Model-yellow)](https://huggingface.co/dronefreak/human-action-classification-stanford40/tree/main/resnet18)          |
 
-**Input:** Single RGB image @ 224×224  
+**Input:** Single RGB image @ 224×224
 **Use case:** Real-time single-frame action classification (fitness, sports, daily activities)
 
 ---
@@ -454,8 +456,8 @@ If you use this work, please cite:
 
 ## 📧 Contact
 
-**Author:** Saumya Kumaar Saksena  
-**GitHub:** [@dronefreak](https://github.com/dronefreak)  
+**Author:** Saumya Kumaar Saksena
+**GitHub:** [@dronefreak](https://github.com/dronefreak)
 **Models:** [HuggingFace](https://huggingface.co/dronefreak)
 
 ---
