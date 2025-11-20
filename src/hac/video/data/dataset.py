@@ -46,6 +46,7 @@ class VideoDataset(Dataset):
         self.samples = []
         self.classes = sorted([d.name for d in self.root_dir.iterdir() if d.is_dir()])
         self.class_to_idx = {c: i for i, c in enumerate(self.classes)}
+        self.is_training = "train" in str(self.root_dir).lower()
 
         # Scan for videos or frame directories
         self._load_samples()
@@ -97,7 +98,7 @@ class VideoDataset(Dataset):
             frames = self._load_frames_from_dir(path)
 
         # Sample frames
-        frames = self._sample_frames(frames)
+        frames = self._sample_frames(frames, is_training=self.is_training)
 
         # Apply transforms
         if self.transform:
@@ -156,19 +157,36 @@ class VideoDataset(Dataset):
 
         return frames
 
-    def _sample_frames(self, frames):
-        """Sample num_frames uniformly from video."""
+    def _sample_frames(self, frames, is_training=False):
+        """Sample num_frames with temporal randomness during training."""
         total_frames = len(frames)
 
-        if total_frames < self.num_frames:
-            # Repeat frames if video too short
+        if total_frames <= self.num_frames:
+            # Pad short videos by repeating
             indices = np.arange(total_frames)
             indices = np.tile(indices, int(np.ceil(self.num_frames / total_frames)))
             indices = indices[: self.num_frames]
         else:
-            # Uniform sampling
-            indices = np.linspace(0, total_frames - 1, self.num_frames).astype(int)
+            if is_training:
+                # Random start + random stride (with frame_interval)
+                max_offset = total_frames - self.num_frames * self.frame_interval
+                if max_offset <= 0:
+                    # Fall back to uniform if video too short
+                    indices = np.linspace(0, total_frames - 1, self.num_frames).astype(
+                        int
+                    )
+                else:
+                    start = np.random.randint(0, max_offset + 1)
+                    indices = start + self.frame_interval * np.arange(self.num_frames)
+            else:
+                # Center sampling for validation
+                start = (total_frames - self.num_frames * self.frame_interval) // 2
+                if start < 0:
+                    start = 0
+                indices = start + self.frame_interval * np.arange(self.num_frames)
 
+        # Clip indices to valid range
+        indices = np.clip(indices, 0, total_frames - 1)
         return [frames[i] for i in indices]
 
 
