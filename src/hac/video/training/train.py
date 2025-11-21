@@ -285,6 +285,17 @@ def main():
     parser.add_argument(
         "--pretrained", action="store_true", help="Use pretrained weights"
     )
+    parser.add_argument(
+        "--freeze_backbone",
+        action="store_true",
+        help="Freeze backbone and only train final classifier (for small datasets)",
+    )
+    parser.add_argument(
+        "--resume",
+        type=str,
+        default=None,
+        help="Path to checkpoint to resume from (for transfer learning)",
+    )
 
     # Video sampling
     parser.add_argument("--num_frames", type=int, default=16, help="Frames per clip")
@@ -430,10 +441,60 @@ def main():
     model = Video3DCNN(
         num_classes=args.num_classes, model_name=args.model, pretrained=args.pretrained
     )
+
+    # Load from custom checkpoint if provided (for transfer learning)
+    if args.resume:
+        print(f"\nLoading checkpoint from: {args.resume}")
+        checkpoint = torch.load(args.resume, map_location="cpu")
+
+        # Handle different checkpoint formats
+        if "model_state_dict" in checkpoint:
+            state_dict = checkpoint["model_state_dict"]
+        else:
+            state_dict = checkpoint
+
+        # Try to load state dict, handling num_classes mismatch
+        try:
+            model.load_state_dict(state_dict, strict=True)
+            print("✓ Loaded checkpoint with strict matching")
+        except RuntimeError as e:
+            # Num classes mismatch - load all except final layer
+            print(f"⚠ Strict loading failed: {e}")
+            print("  Loading all layers except final classifier (num_classes mismatch)")
+
+            # Filter out final layer weights
+            if args.model in ["r3d_18", "mc3_18", "r2plus1d_18"]:
+                filtered_dict = {
+                    k: v
+                    for k, v in state_dict.items()
+                    if not k.startswith("backbone.fc")
+                }
+            else:  # Transformer models
+                filtered_dict = {
+                    k: v
+                    for k, v in state_dict.items()
+                    if not k.startswith("backbone.head")
+                }
+
+            model.load_state_dict(filtered_dict, strict=False)
+            print("✓ Loaded backbone weights, initialized new classifier")
+
+    # Optionally freeze backbone for transfer learning
+    if args.freeze_backbone:
+        if not args.pretrained and not args.resume:
+            print(
+                "WARNING: --freeze_backbone should be"
+                "used with --pretrained or --resume"
+            )
+        model.freeze_backbone()
+
     model = model.to(device)
 
     print(f"\nModel: {args.model}")
     print(f"Parameters: {sum(p.numel() for p in model.parameters()) / 1e6:.1f}M")
+    if args.freeze_backbone:
+        trainable = sum(p.numel() for p in model.parameters() if p.requires_grad) / 1e6
+        print(f"Trainable: {trainable:.1f}M")
 
     # Loss and optimizer
     criterion = nn.CrossEntropyLoss(label_smoothing=args.label_smoothing).to(device)
