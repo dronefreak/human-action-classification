@@ -206,6 +206,7 @@ def test_dataset():
     # Simple transform
     transform = transforms.Compose(
         [
+            transforms.ToPILImage(),
             transforms.Resize((128, 171)),
             transforms.CenterCrop(112),
             transforms.ToTensor(),
