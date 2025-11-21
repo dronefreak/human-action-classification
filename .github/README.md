@@ -55,6 +55,17 @@ _Our models match or exceed original papers!_
 
 </details>
 
+### 🎥 Video Models (Temporal - HMDB51)
+
+| Model      | Init         | Accuracy   | Train-Val Gap | Params | Dataset             | Download                                                                                                            |
+| ---------- | ------------ | ---------- | ------------- | ------ | ------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **MC3-18** | Kinetics-400 | **56.34%** | 19%           | 11.7M  | HMDB51 (51 classes) | [![HF](https://img.shields.io/badge/🤗-Model-yellow)](https://huggingface.co/dronefreak/mc3-18-hmdb51-kinetics)     |
+| **MC3-18** | UCF-101      | **55.46%** | 13%           | 11.7M  | HMDB51 (51 classes) | [![HF](https://img.shields.io/badge/🤗-Model-yellow)](https://huggingface.co/dronefreak/mc3-18-hmdb51-ucf-transfer) |
+
+**Input:** 8-frame clips @ 112×112 (Kinetics init), 16-frame clips @ 112×112 (UCF-101 init)  
+**Use case:** Human action recognition in short video clips  
+**Note:** Reference baselines showing transfer learning tradeoffs. Kinetics initialization performs slightly better but overfits more. UCF-101 initialization shows better generalization despite lower accuracy.
+
 ### 🖼️ Image Models (Pose-based - Stanford40)
 
 | Model             | Accuracy  | Speed | Dataset                 | Download                                                                                                                                                    |
