@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""Updated video/models/classifier.py with lightweight models.
-
-Add this to your existing classifier.py
-"""
+"""Updated video/models/classifier.py with lightweight models."""
 
 import torch.nn as nn
 from torchvision.models.video import (
@@ -99,6 +96,37 @@ class Video3DCNN(nn.Module):
 
         self.model_name = model_name
         self.num_classes = num_classes
+
+    def freeze_backbone(self):
+        """Freeze all backbone parameters except the final classifier.
+
+        This is useful for transfer learning on small datasets. Only the final fc/head
+        layer will be trainable.
+        """
+        # Freeze all parameters first
+        for param in self.backbone.parameters():
+            param.requires_grad = False
+
+        # Unfreeze the final classifier layer
+        if self.model_name in ["r3d_18", "mc3_18", "r2plus1d_18"]:
+            # ResNet3D family - unfreeze fc layer
+            for param in self.backbone.fc.parameters():
+                param.requires_grad = True
+        elif self.model_name in [
+            "mvit_v1_b",
+            "mvit_v2_s",
+            "swin3d_t",
+            "swin3d_s",
+            "swin3d_b",
+        ]:
+            # Transformer-based - unfreeze head
+            for param in self.backbone.head.parameters():
+                param.requires_grad = True
+
+        print(f"✓ Backbone frozen. Only training final classifier layer.")
+        trainable_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
+        total_params = sum(p.numel() for p in self.parameters())
+        print(f"  Trainable: {trainable_params:,} / {total_params:,} parameters")
 
     def forward(self, x):
         """

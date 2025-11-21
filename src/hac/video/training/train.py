@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Train video action classifier on UCF-101."""
+"""Train video action classifier on Video Action Recognition datasets like UCF-101,
+HMDB51 etc."""
 
 import argparse
 import json
@@ -285,6 +286,11 @@ def main():
     parser.add_argument(
         "--pretrained", action="store_true", help="Use pretrained weights"
     )
+    parser.add_argument(
+        "--freeze_backbone",
+        action="store_true",
+        help="Freeze backbone and only train final classifier (for small datasets)",
+    )
 
     # Video sampling
     parser.add_argument("--num_frames", type=int, default=16, help="Frames per clip")
@@ -430,10 +436,20 @@ def main():
     model = Video3DCNN(
         num_classes=args.num_classes, model_name=args.model, pretrained=args.pretrained
     )
+
+    # Optionally freeze backbone for transfer learning
+    if args.freeze_backbone:
+        if not args.pretrained:
+            print("WARNING: --freeze_backbone should be used with --pretrained")
+        model.freeze_backbone()
+
     model = model.to(device)
 
     print(f"\nModel: {args.model}")
     print(f"Parameters: {sum(p.numel() for p in model.parameters()) / 1e6:.1f}M")
+    if args.freeze_backbone:
+        trainable = sum(p.numel() for p in model.parameters() if p.requires_grad) / 1e6
+        print(f"Trainable: {trainable:.1f}M")
 
     # Loss and optimizer
     criterion = nn.CrossEntropyLoss(label_smoothing=args.label_smoothing).to(device)
