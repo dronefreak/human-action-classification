@@ -1,0 +1,25 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+type: software
+title: "Human Action Classification: Pose-based and Video-based Models"
+abstract: "Modern human action classification system supporting both pose-based (MediaPipe) and video-based (3D CNN) approaches. Includes 100+ model architectures achieving real-time performance for pose classification and reference implementations for temporal action recognition on UCF-101 (87% accuracy) and HMDB51 (56% accuracy). Designed for autonomous vehicles, video surveillance, and action recognition research."
+authors:
+  - family-names: "Saksena"
+    given-names: "Saumya"
+    orcid: "https://orcid.org/0000-0003-2213-8265"
+repository-code: "https://github.com/dronefreak/human-action-classification"
+url: "https://github.com/dronefreak/human-action-classification"
+keywords:
+  - action-recognition
+  - video-classification
+  - pose-estimation
+  - deep-learning
+  - pytorch
+  - mediapipe
+  - 3d-cnn
+  - computer-vision
+  - ucf101
+  - hmdb51
+license: Apache-2.0 license
+version: 1.0.0
+date-released: 2026-01-18

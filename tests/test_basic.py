@@ -7,9 +7,10 @@ import torch
 
 def test_imports():
     """Test that main modules can be imported."""
-    from hac import ActionClassifier, ActionPredictor
-    from hac.inference.pose_extractor import PoseExtractor
-    from hac.models.classifier import create_model
+    from hac import ActionClassifier
+    from hac.image.inference.pose_extractor import PoseExtractor
+    from hac.image.inference.predictor import ActionPredictor
+    from hac.image.models.classifier import create_model
 
     # Basic sanity checks
     assert callable(create_model), "create_model should be callable"
@@ -20,7 +21,7 @@ def test_imports():
 
 def test_model_creation():
     """Test model creation."""
-    from hac.models.classifier import create_model
+    from hac.image.models.classifier import create_model
 
     model = create_model(
         model_type="action",
@@ -40,7 +41,7 @@ def test_model_creation():
 
 def test_pose_extractor():
     """Test pose extraction."""
-    from hac.inference.pose_extractor import PoseExtractor
+    from hac.image.inference.pose_extractor import PoseExtractor
 
     pose_extractor = PoseExtractor()
 
@@ -56,7 +57,7 @@ def test_pose_extractor():
 
 def test_transforms():
     """Test image transforms."""
-    from hac.utils.transforms import get_inference_transforms, get_training_transforms
+    from hac.common.transforms import get_inference_transforms, get_training_transforms
 
     train_transform = get_training_transforms()
     infer_transform = get_inference_transforms()

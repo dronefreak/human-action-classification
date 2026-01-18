@@ -123,7 +123,7 @@ class Video3DCNN(nn.Module):
             for param in self.backbone.head.parameters():
                 param.requires_grad = True
 
-        print(f"✓ Backbone frozen. Only training final classifier layer.")
+        print("✓ Backbone frozen. Only training final classifier layer.")
         trainable_params = sum(p.numel() for p in self.parameters() if p.requires_grad)
         total_params = sum(p.numel() for p in self.parameters())
         print(f"  Trainable: {trainable_params:,} / {total_params:,} parameters")
