@@ -28,7 +28,7 @@ jobs:
         run: |
           pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
           pip install scikit-learn pandas safetensors
-          pip install lark opencv-python
+          pip install lark opencv-python mediapipe
 
       - name: Install package
         run: |
