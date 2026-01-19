@@ -24,14 +24,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libgl1 libglib2.0-0
 
-      - name: Install PyTorch CPU-only
+      - name: Install PyTorch CPU-only and other dependencies
         run: |
           pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+          pip install scikit-learn pandas numpy matplotlib seaborn
+          pip install lark tqdm hydra-core timm opencv-python mediapipe
 
       - name: Install package
         run: |
           pip install -e ".[dev]" --no-deps
-          pip install pytest black flake8 safetensors
+          pip install pytest black flake8
 
       - name: Lint with flake8
         run: |
