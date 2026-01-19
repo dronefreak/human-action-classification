@@ -33,7 +33,7 @@ jobs:
       - name: Install package
         run: |
           pip install -e ".[dev]" --no-deps
-          pip install pytest black flake8
+          pip install pytest black flake8, isort
 
       - name: Lint with flake8
         run: |
@@ -42,6 +42,10 @@ jobs:
       - name: Check formatting with black
         run: |
           black --check src/
+
+      - name: Run isort
+        run: |
+          isort --check-only src/
 
       - name: Run tests
         run: |
