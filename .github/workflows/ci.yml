@@ -46,14 +46,3 @@ jobs:
       - name: Run tests
         run: |
           pytest tests/ -v
-
-  docker:
-    runs-on: ubuntu-latest
-    needs: test
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Build Docker image
-        run: |
-          docker build -t human-action-classification:latest .
