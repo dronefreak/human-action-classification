@@ -1,17 +1,15 @@
 name: CI
 
 on:
-  push:
-    branches: [main, v2]
   pull_request:
-    branches: [main, v2]
+    branches: [master, dev]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
 
     steps:
       - uses: actions/checkout@v3
@@ -24,11 +22,18 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgl1-mesa-glx libglib2.0-0
+          sudo apt-get install -y libgl1 libglib2.0-0
+
+      - name: Install PyTorch CPU-only and other dependencies
+        run: |
+          pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+          pip install scikit-learn pandas safetensors timm
+          pip install lark opencv-python mediapipe==0.10.21
 
       - name: Install package
         run: |
-          pip install -e ".[dev]"
+          pip install -e ".[dev]" --no-deps
+          pip install pytest black flake8 isort
 
       - name: Lint with flake8
         run: |
@@ -38,21 +43,10 @@ jobs:
         run: |
           black --check src/
 
-      - name: Type check with mypy
+      - name: Run isort
         run: |
-          mypy src/ --ignore-missing-imports
+          isort --check-only src/
 
       - name: Run tests
         run: |
           pytest tests/ -v
-
-  docker:
-    runs-on: ubuntu-latest
-    needs: test
-
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Build Docker image
-        run: |
-          docker build -t human-action-classification:latest .

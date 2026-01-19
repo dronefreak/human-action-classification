@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Video action predictor for inference."""
 
-
 import cv2
 import numpy as np
 import torch
