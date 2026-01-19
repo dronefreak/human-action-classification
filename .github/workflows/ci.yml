@@ -27,8 +27,8 @@ jobs:
       - name: Install PyTorch CPU-only and other dependencies
         run: |
           pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-          pip install scikit-learn pandas numpy matplotlib seaborn
-          pip install lark tqdm hydra-core timm opencv-python mediapipe
+          pip install scikit-learn pandas
+          pip install lark opencv-python
 
       - name: Install package
         run: |
