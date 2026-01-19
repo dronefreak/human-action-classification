@@ -31,7 +31,7 @@ jobs:
       - name: Install package
         run: |
           pip install -e ".[dev]" --no-deps
-          pip install pytest black flake8
+          pip install pytest black flake8 safetensors
 
       - name: Lint with flake8
         run: |
