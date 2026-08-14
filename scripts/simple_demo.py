@@ -18,28 +18,30 @@ from hac import ActionPredictor
 def draw_keypoints_skeleton(
     image: np.ndarray, keypoints: np.ndarray, confidence_threshold: float = 0.3
 ):
-    """Draw pose keypoints with colored skeleton on image."""
+    """Draw pose keypoints with colored skeleton on image.
 
-    # COCO skeleton connections
+    keypoints: (33, 3) array of [x, y, visibility] normalized to [0, 1],
+    as returned by hac.image.inference.pose_extractor.PoseExtractor
+    (MediaPipe Pose landmark layout).
+    """
+    h, w = image.shape[:2]
+
+    # MediaPipe Pose skeleton connections (landmark indices)
     skeleton = [
-        (0, 1),
-        (0, 2),
-        (1, 3),
-        (2, 4),  # head
-        (0, 5),
-        (0, 6),
-        (5, 7),
-        (7, 9),  # left arm
-        (6, 8),
-        (8, 10),  # right arm
-        (5, 6),
-        (5, 11),
-        (6, 12),  # torso
-        (11, 12),
+        (0, 11),
+        (0, 12),  # head to shoulders
+        (11, 12),  # shoulders
+        (11, 23),
+        (12, 24),
+        (23, 24),  # torso
         (11, 13),
-        (13, 15),  # left leg
+        (13, 15),  # left arm
         (12, 14),
-        (14, 16),  # right leg
+        (14, 16),  # right arm
+        (23, 25),
+        (25, 27),  # left leg
+        (24, 26),
+        (26, 28),  # right leg
     ]
 
     # Colors (BGR)
@@ -56,14 +58,14 @@ def draw_keypoints_skeleton(
                 start_point[2] > confidence_threshold
                 and end_point[2] > confidence_threshold
             ):
-                start_pos = (int(start_point[0]), int(start_point[1]))
-                end_pos = (int(end_point[0]), int(end_point[1]))
+                start_pos = (int(start_point[0] * w), int(start_point[1] * h))
+                end_pos = (int(end_point[0] * w), int(end_point[1] * h))
                 cv2.line(image, start_pos, end_pos, line_color, 2, cv2.LINE_AA)
 
     # Draw keypoints
     for kpt in keypoints:
         if kpt[2] > confidence_threshold:
-            x, y = int(kpt[0]), int(kpt[1])
+            x, y = int(kpt[0] * w), int(kpt[1] * h)
             cv2.circle(image, (x, y), 4, point_color, -1, cv2.LINE_AA)
             cv2.circle(image, (x, y), 5, (255, 255, 255), 1, cv2.LINE_AA)
 

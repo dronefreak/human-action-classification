@@ -47,7 +47,7 @@ def convert_to_safetensors(checkpoint_path: str, output_path: str = None) -> str
 
     try:
         # Load checkpoint (CPU to avoid GPU memory)
-        checkpoint = torch.load(checkpoint_path, map_location="cpu")
+        checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
 
         # Extract state dict
         state_dict = checkpoint.get("model_state_dict", checkpoint)
@@ -90,7 +90,7 @@ def load_checkpoint(
     """
     print(f"Loading checkpoint from: {checkpoint_path}")
 
-    checkpoint = torch.load(checkpoint_path, map_location=device)
+    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
 
     # Load model weights
     model.load_state_dict(checkpoint["model_state_dict"])

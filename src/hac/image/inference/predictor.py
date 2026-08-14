@@ -146,7 +146,7 @@ class ActionPredictor:
         num_classes = config.get("num_classes", 40)
 
         # Create model
-        from hac.models.classifier import create_model
+        from hac.image.models.classifier import create_model
 
         model = create_model(
             model_type="action",
