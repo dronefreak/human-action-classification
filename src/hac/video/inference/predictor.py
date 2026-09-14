@@ -42,8 +42,20 @@ class VideoPredictor:
             ]
         )
 
-        # Class names (UCF-101)
-        self.class_names = self._get_ucf101_classes()
+        # Class names: pick the list matching the checkpoint's own class count
+        # rather than assuming UCF-101, since this project also ships HMDB51
+        # checkpoints (a different 51-class label set) through the same class.
+        num_classes = self.model.num_classes
+        if num_classes == 101:
+            self.class_names = self._get_ucf101_classes()
+        elif num_classes == 51:
+            self.class_names = self._get_hmdb51_classes()
+        else:
+            print(
+                f"Warning: no known class names for {num_classes}-class checkpoint; "
+                "falling back to generic 'class_N' labels."
+            )
+            self.class_names = [f"class_{i}" for i in range(num_classes)]
 
     def _load_model(self, model_path):
         """Load model from checkpoint."""
@@ -178,6 +190,63 @@ class VideoPredictor:
             "YoYo",
         ]
         return classes
+
+    def _get_hmdb51_classes(self):
+        """Get HMDB51 class names (alphabetical, matching the dataset's own directory-
+        name ordering used by VideoDataset/SpatialDataset)."""
+        return [
+            "brush_hair",
+            "cartwheel",
+            "catch",
+            "chew",
+            "clap",
+            "climb",
+            "climb_stairs",
+            "dive",
+            "draw_sword",
+            "dribble",
+            "drink",
+            "eat",
+            "fall_floor",
+            "fencing",
+            "flic_flac",
+            "golf",
+            "handstand",
+            "hit",
+            "hug",
+            "jump",
+            "kick",
+            "kick_ball",
+            "kiss",
+            "laugh",
+            "pick",
+            "pour",
+            "pullup",
+            "punch",
+            "push",
+            "pushup",
+            "ride_bike",
+            "ride_horse",
+            "run",
+            "shake_hands",
+            "shoot_ball",
+            "shoot_bow",
+            "shoot_gun",
+            "sit",
+            "situp",
+            "smile",
+            "smoke",
+            "somersault",
+            "stand",
+            "swing_baseball",
+            "sword",
+            "sword_exercise",
+            "talk",
+            "throw",
+            "turn",
+            "walk",
+            "wave",
+        ]
 
     def _load_video(self, video_path):
         """Load video and extract frames."""

@@ -26,7 +26,7 @@ from hac.image.models.classifier import create_model
 def load_model_from_checkpoint(checkpoint_path: str, device: str = "cuda"):
     """Load model from checkpoint and extract config."""
     print(f"Loading checkpoint: {checkpoint_path}")
-    checkpoint = torch.load(checkpoint_path, map_location=device)
+    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
 
     # Extract config
     config = checkpoint.get("config", {})
