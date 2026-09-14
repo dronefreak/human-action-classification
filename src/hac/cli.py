@@ -13,14 +13,14 @@ def infer():
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
             Examples:
-            # Single image
-            hac-infer --image path/to/image.jpg --model weights/best.pth
+            # Single image (pose-aware image pipeline)
+            hac-infer --image path/to/image.jpg --model weights/resnet50.pth
 
-            # Video
-            hac-infer --video path/to/video.mp4 --model weights/best.pth
+            # Video (3D-CNN video pipeline, e.g. MC3-18/R3D-18)
+            hac-infer --video path/to/video.mp4 --model weights/mc3-18-ucf101.pth
 
-            # Webcam
-            hac-infer --webcam --model weights/best.pth
+            # Webcam (pose-aware image pipeline)
+            hac-infer --webcam --model weights/resnet50.pth
                 """,
     )
 
@@ -32,6 +32,13 @@ def infer():
     parser.add_argument(
         "--top_k", type=int, default=5, help="Number of top predictions"
     )
+    parser.add_argument(
+        "--num_frames",
+        type=int,
+        default=16,
+        help="Frames sampled per clip (video only; use 8 for the "
+        "Kinetics-400-initialized HMDB51 model, 16 for the UCF-101 models)",
+    )
 
     args = parser.parse_args()
 
@@ -39,13 +46,32 @@ def infer():
     if not (args.image or args.video or args.webcam):
         parser.error("Must specify one of: --image, --video, or --webcam")
 
-    # Initialize predictor
+    # --video uses the dedicated 3D-CNN video pipeline (MC3-18/R3D-18), which
+    # is a different model family from --image/--webcam's pose-aware 2D pipeline.
+    if args.video:
+        from hac.video.inference.predictor import VideoPredictor
+
+        print(f"Loading video model from: {args.model}")
+        predictor = VideoPredictor(
+            model_path=args.model, num_frames=args.num_frames, device=args.device
+        )
+
+        print(f"\nProcessing video: {args.video}")
+        result = predictor.predict_video(args.video, top_k=args.top_k)
+
+        print(f"\nVideo: {result['video_path']}")
+        print(f"Frames: {result['num_frames']} (sampled {result['sampled_frames']})")
+        print(f"\nTop {args.top_k} Action Predictions:")
+        for i, pred in enumerate(result["predictions"], 1):
+            print(f"  {i}. {pred['class']}: {pred['confidence']:.3f}")
+        return
+
+    # --image / --webcam use the pose-aware image pipeline
     print(f"Loading model from: {args.model}")
     predictor = ActionPredictor(
         model_path=args.model, device=args.device, use_pose_estimation=True
     )
 
-    # Run inference
     if args.image:
         print(f"\nProcessing image: {args.image}")
         result = predictor.predict_image(args.image, top_k=args.top_k)
@@ -57,16 +83,6 @@ def infer():
         print(f"\nTop {args.top_k} Action Predictions:")
         for i, pred in enumerate(result["action"]["predictions"], 1):
             print(f"  {i}. {pred['class']}: {pred['confidence']:.3f}")
-
-    elif args.video:
-        print(f"\nProcessing video: {args.video}")
-        result = predictor.predict_video(args.video)
-
-        print(f"\nVideo: {result['video_path']}")
-        print(f"Total frames: {result['total_frames']}")
-        print(f"Sampled frames: {result['sampled_frames']}")
-        print(f"\nPredicted Action: {result['prediction']}")
-        print(f"Confidence: {result['confidence']:.3f}")
 
     elif args.webcam:
         print("\nStarting webcam prediction...")

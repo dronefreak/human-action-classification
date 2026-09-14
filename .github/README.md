@@ -63,7 +63,7 @@ result = predictor.predict_video("clip.mp4", top_k=3)
 print(result["top_class"], result["top_confidence"])
 ```
 
-CLI equivalent: `python -m hac.video.inference.predictor --model_path <path> --video_path clip.mp4`
+CLI equivalent: `hac-infer --video clip.mp4 --model <path>` (add `--num_frames 8` for the Kinetics-400-initialized HMDB51 model; UCF-101 and UCF-101-initialized HMDB51 models use the default of 16).
 
 ### Image
 
