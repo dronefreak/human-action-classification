@@ -118,8 +118,14 @@ def compute_per_class_metrics(
     overall_accuracy = accuracy_score(y_true, y_pred) * 100
 
     # Per-class metrics
+    # Score every class index so per-class rows line up with class_names even
+    # when some classes never appear in this split.
     precision, recall, f1, support = precision_recall_fscore_support(
-        y_true, y_pred, average=None, zero_division=0
+        y_true,
+        y_pred,
+        labels=list(range(len(class_names))),
+        average=None,
+        zero_division=0,
     )
 
     # Macro averages
@@ -168,7 +174,7 @@ def compute_confusion_matrix(
     """Compute confusion matrix."""
     from sklearn.metrics import confusion_matrix
 
-    cm = confusion_matrix(y_true, y_pred)
+    cm = confusion_matrix(y_true, y_pred, labels=list(range(len(class_names))))
 
     print(f"✓ Confusion matrix computed: {cm.shape}")
 
@@ -452,8 +458,12 @@ Examples:
 
     # Load dataset
     print(f"\nLoading {args.split} dataset...")
+    # Use the checkpoint's class list (if stored) so indices match training
     dataset = ActionDataset(
-        root_dir=args.data_dir, split=args.split, transform=get_inference_transforms()
+        root_dir=args.data_dir,
+        split=args.split,
+        transform=get_inference_transforms(),
+        class_names=checkpoint.get("class_names"),
     )
 
     dataloader = DataLoader(

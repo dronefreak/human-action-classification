@@ -26,6 +26,7 @@ class VideoDataset(Dataset):
         frame_interval=2,
         transform=None,
         mode="frames",  # 'frames' or 'videos'
+        class_names=None,
     ):
         """Initialize video dataset.
 
@@ -35,6 +36,9 @@ class VideoDataset(Dataset):
             frame_interval: Stride between sampled frames (ignored for frames mode)
             transform: Transform to apply to each frame
             mode: 'frames' (directories) or 'videos' (.avi files)
+            class_names: Optional fixed class list (e.g. from the train split) so
+                label indices stay consistent across splits. Inferred from the
+                sorted subdirectory names if None.
         """
         self.root_dir = Path(root_dir)
         self.num_frames = num_frames
@@ -44,7 +48,12 @@ class VideoDataset(Dataset):
 
         # Get all samples
         self.samples = []
-        self.classes = sorted([d.name for d in self.root_dir.iterdir() if d.is_dir()])
+        if class_names is None:
+            self.classes = sorted(
+                [d.name for d in self.root_dir.iterdir() if d.is_dir()]
+            )
+        else:
+            self.classes = list(class_names)
         self.class_to_idx = {c: i for i, c in enumerate(self.classes)}
 
         # Scan for videos or frame directories
@@ -62,7 +71,7 @@ class VideoDataset(Dataset):
     def _load_samples(self):
         """Load all video samples."""
         for class_dir in self.root_dir.iterdir():
-            if not class_dir.is_dir():
+            if not class_dir.is_dir() or class_dir.name not in self.class_to_idx:
                 continue
 
             class_idx = self.class_to_idx[class_dir.name]

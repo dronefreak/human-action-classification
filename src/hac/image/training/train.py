@@ -3,7 +3,7 @@
 import argparse
 import json
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 import torch
 import torch.nn as nn
@@ -194,8 +194,10 @@ class Trainer:
         use_mixup: bool = False,
         mixup_alpha: float = 0.4,
         label_smoothing: float = 0.0,
+        class_names: Optional[List[str]] = None,
     ):
         self.model = model.to(device)
+        self.class_names = list(class_names) if class_names else None
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.optimizer = optimizer
@@ -328,6 +330,7 @@ class Trainer:
             "config": (
                 self.model.get_config() if hasattr(self.model, "get_config") else {}
             ),
+            "class_names": self.class_names,
         }
 
         # Save latest
@@ -455,11 +458,21 @@ def main():
         transform=get_training_transforms(),
     )
 
+    # Reuse the training class list so label indices match across splits even
+    # if the evaluation split is missing a class directory.
     val_dataset = ActionDataset(
         root_dir=args.data_dir,
         split=args.test_split,
         transform=get_inference_transforms(),
+        class_names=train_dataset.class_names,
     )
+
+    if len(train_dataset.class_names) != args.num_classes:
+        raise ValueError(
+            f"--num_classes={args.num_classes} but found "
+            f"{len(train_dataset.class_names)} class directories in "
+            f"{Path(args.data_dir) / args.train_split}"
+        )
 
     # Create data loaders
     train_loader = DataLoader(
@@ -528,6 +541,7 @@ def main():
         use_mixup=args.mixup,
         mixup_alpha=args.mixup_alpha,
         label_smoothing=args.label_smoothing,
+        class_names=train_dataset.class_names,
     )
 
     # Train

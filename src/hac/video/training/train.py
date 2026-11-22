@@ -37,8 +37,10 @@ class VideoTrainer:
         use_augmentation=True,
         mixup_alpha=0.4,
         cutmix_alpha=1.0,
+        class_names=None,
     ):
         self.model = model
+        self.class_names = list(class_names) if class_names else None
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.optimizer = optimizer
@@ -184,6 +186,7 @@ class VideoTrainer:
             "config": (
                 self.model.get_config() if hasattr(self.model, "get_config") else {}
             ),
+            "class_names": self.class_names,
         }
 
         # Save latest
@@ -408,7 +411,14 @@ def main():
         frame_interval=args.frame_interval,
         transform=val_transform,
         mode=mode,
+        class_names=train_dataset.classes,  # keep label indices aligned
     )
+
+    if len(train_dataset.classes) != args.num_classes:
+        raise ValueError(
+            f"--num_classes={args.num_classes} but found "
+            f"{len(train_dataset.classes)} class directories in {train_dir}"
+        )
 
     print("\nDataset:")
     print(f"  Train: {len(train_dataset)} videos")
@@ -475,6 +485,7 @@ def main():
         use_augmentation=args.use_augmentation,
         mixup_alpha=args.mixup_alpha,
         cutmix_alpha=args.cutmix_alpha,
+        class_names=train_dataset.classes,
     )
 
     # Train
