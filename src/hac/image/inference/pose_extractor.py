@@ -3,6 +3,7 @@
 Much faster and easier to use than OpenPose/tf-pose-estimation.
 """
 
+import sys
 from typing import Optional
 
 import cv2
@@ -132,10 +133,28 @@ class PoseExtractor:
 
         return image
 
+    def close(self):
+        """Release the MediaPipe graph.
+
+        Safe to call more than once.
+        """
+        pose = getattr(self, "pose", None)
+        if pose is not None:
+            self.pose = None
+            pose.close()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        self.close()
+
     def __del__(self):
-        """Cleanup."""
-        if hasattr(self, "pose"):
-            self.pose.close()
+        # MediaPipe's close() can deadlock during interpreter shutdown (e.g. when
+        # an uncaught exception still references this object), so only close
+        # eagerly while the interpreter is alive; the OS reclaims it otherwise.
+        if not sys.is_finalizing():
+            self.close()
 
 
 class PoseClassifier:
