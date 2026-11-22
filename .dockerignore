@@ -1,0 +1,11 @@
+# Keep the build context small: only what the Dockerfile COPYs is needed.
+*
+!pyproject.toml
+!.github/README.md
+!src/
+!scripts/
+!examples/
+!assets/
+**/__pycache__
+**/*.py[cod]
+**/*.egg-info
