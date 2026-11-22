@@ -81,6 +81,21 @@ def test_predictor_safetensors_needs_architecture_hint(tmp_path):
         _predictor(weights)
 
 
+def test_predictor_safetensors_reads_sibling_config(tmp_path):
+    import json
+
+    from safetensors.torch import save_file
+
+    model = create_model(model_name=ARCH, num_classes=3, pretrained=False)
+    save_file(model.state_dict(), str(tmp_path / "model.safetensors"))
+    (tmp_path / "config.json").write_text(
+        json.dumps({"model_name": ARCH, "num_classes": 3, "class_names": IMAGE_CLASSES})
+    )
+    predictor = _predictor(tmp_path / "model.safetensors")  # no hints needed
+    assert predictor.model.model_name == ARCH
+    assert predictor.class_names == IMAGE_CLASSES
+
+
 def test_predictor_video_voting(tmp_path, video_file):
     ckpt = tmp_path / "m.pth"
     _save_image_checkpoint(ckpt, class_names=IMAGE_CLASSES)

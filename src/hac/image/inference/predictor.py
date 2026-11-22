@@ -1,5 +1,7 @@
 """Main predictor class for easy inference."""
 
+import json
+from pathlib import Path
 from typing import Dict, List, Optional, Union
 
 import cv2
@@ -118,12 +120,24 @@ class ActionPredictor:
                     "/".join(parts[2:]) if len(parts) > 2 else "model.safetensors"
                 )
 
+            # A sub-folder (e.g. hf://<repo>/resnet50) means its model.safetensors
+            if "." not in Path(filename).name:
+                filename = f"{filename.rstrip('/')}/model.safetensors"
+
             # Download from HuggingFace Hub
             try:
                 model_path = hf_hub_download(
                     repo_id=repo_id, filename=filename, cache_dir=None
                 )
                 print(f"✓ Downloaded to: {model_path}")
+                # Fetch the sibling config.json (architecture + class names) too
+                try:
+                    hf_hub_download(
+                        repo_id=repo_id,
+                        filename=str(Path(filename).with_name("config.json")),
+                    )
+                except Exception:
+                    pass  # optional; fall back to arguments/defaults
             except Exception as e:
                 raise ValueError(
                     f"Failed to download model from HuggingFace: {e}\n"
@@ -143,7 +157,11 @@ class ActionPredictor:
                 )
 
             state_dict = load_file(model_path)
-            config = {}  # SafeTensors doesn't store config
+            # SafeTensors holds no config; use a sibling config.json if present
+            # (the Hugging Face model folders ship one).
+            config = self._read_sibling_config(model_path)
+            if config.get("class_names"):
+                self._checkpoint = {"class_names": config["class_names"]}
 
         else:
             # Load PyTorch checkpoint - FIX: Add weights_only=False for compatibility
@@ -198,6 +216,22 @@ class ActionPredictor:
         print(f"✓ Model loaded: {model_name} ({num_classes} classes)")
 
         return model
+
+    @staticmethod
+    def _read_sibling_config(model_path: str) -> Dict:
+        """Load ``config.json`` next to a weights file, or {} if absent/invalid."""
+        config_path = Path(model_path).with_name("config.json")
+        if not config_path.is_file():
+            return {}
+        try:
+            with open(config_path) as f:
+                config = json.load(f)
+        except (OSError, ValueError):
+            return {}
+        if not isinstance(config, dict):
+            return {}
+        print(f"✓ Using architecture info from {config_path}")
+        return config
 
     @torch.no_grad()
     def predict_image(
