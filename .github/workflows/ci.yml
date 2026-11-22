@@ -1,52 +1,48 @@
 name: CI
 
 on:
+  push:
+    branches: [master, dev]
   pull_request:
     branches: [master, dev]
+  workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12"]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y libgl1 libglib2.0-0
 
-      - name: Install PyTorch CPU-only and other dependencies
-        run: |
-          pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-          pip install scikit-learn pandas safetensors timm
-          pip install lark opencv-python mediapipe==0.10.21
+      - name: Install CPU-only PyTorch
+        run: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
 
-      - name: Install package
-        run: |
-          pip install -e ".[dev]" --no-deps
-          pip install pytest black flake8 isort
+      - name: Install package (dependencies from pyproject.toml)
+        run: pip install -e ".[dev]"
 
       - name: Lint with flake8
-        run: |
-          flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
+        run: flake8 src/ --count --select=E9,F63,F7,F82 --show-source --statistics
 
       - name: Check formatting with black
-        run: |
-          black --check src/
+        run: black --check src/ tests/
 
-      - name: Run isort
-        run: |
-          isort --check-only src/
+      - name: Check import order with isort
+        run: isort --check-only src/ tests/
 
       - name: Run tests
-        run: |
-          pytest tests/ -v
+        run: pytest tests/ -v

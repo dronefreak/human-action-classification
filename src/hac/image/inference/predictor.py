@@ -1,11 +1,14 @@
 """Main predictor class for easy inference."""
 
+import json
+from pathlib import Path
 from typing import Dict, List, Optional, Union
 
 import cv2
 import numpy as np
 import torch
 
+from hac.common.class_names import STANFORD40_CLASSES, resolve_class_names
 from hac.common.transforms import get_inference_transforms
 from hac.image.inference.pose_extractor import PoseClassifier, PoseExtractor
 from hac.image.models.classifier import ActionClassifier
@@ -24,6 +27,8 @@ class ActionPredictor:
         device: str = "cuda" if torch.cuda.is_available() else "cpu",
         use_pose_estimation: bool = True,
         pose_model_path: Optional[str] = None,
+        model_name: Optional[str] = None,
+        num_classes: Optional[int] = None,
     ):
         """Initialize predictor.
 
@@ -33,8 +38,14 @@ class ActionPredictor:
             device: "cuda" or "cpu"
             use_pose_estimation: Whether to use MediaPipe pose estimation
             pose_model_path: Optional separate model for pose classification
+            model_name: timm architecture, used when the weights carry no config
+                (e.g. ``.safetensors`` files). Defaults to ``resnet34``.
+            num_classes: Class count, used when the weights carry no config.
+                Defaults to 40 (Stanford40).
         """
         self.device = torch.device(device)
+        self._fallback_model_name = model_name
+        self._fallback_num_classes = num_classes
         self.use_pose_estimation = use_pose_estimation
 
         # Initialize pose extractor if needed
@@ -44,7 +55,8 @@ class ActionPredictor:
             )
             self.pose_classifier = PoseClassifier()
 
-        # Load model
+        # Load model (keeps the raw checkpoint so stored class names can be used)
+        self._checkpoint = None
         if model_path:
             self.model = self._load_model(model_path)
         else:
@@ -57,11 +69,19 @@ class ActionPredictor:
         self.model = self.model.to(self.device)
         self.model.eval()
 
-        # Load or use default class names
+        # Class names: explicit argument > checkpoint > Stanford40 default
+        num_classes = self.model.num_classes
         if class_names:
-            self.class_names = class_names
+            if len(class_names) != num_classes:
+                raise ValueError(
+                    f"Got {len(class_names)} class names for a "
+                    f"{num_classes}-class model"
+                )
+            self.class_names = list(class_names)
         else:
-            self.class_names = self._get_default_class_names()
+            self.class_names = resolve_class_names(
+                self._checkpoint, num_classes, STANFORD40_CLASSES
+            )
 
         # Get transforms
         self.transform = get_inference_transforms()
@@ -100,12 +120,24 @@ class ActionPredictor:
                     "/".join(parts[2:]) if len(parts) > 2 else "model.safetensors"
                 )
 
+            # A sub-folder (e.g. hf://<repo>/resnet50) means its model.safetensors
+            if "." not in Path(filename).name:
+                filename = f"{filename.rstrip('/')}/model.safetensors"
+
             # Download from HuggingFace Hub
             try:
                 model_path = hf_hub_download(
                     repo_id=repo_id, filename=filename, cache_dir=None
                 )
                 print(f"✓ Downloaded to: {model_path}")
+                # Fetch the sibling config.json (architecture + class names) too
+                try:
+                    hf_hub_download(
+                        repo_id=repo_id,
+                        filename=str(Path(filename).with_name("config.json")),
+                    )
+                except Exception:
+                    pass  # optional; fall back to arguments/defaults
             except Exception as e:
                 raise ValueError(
                     f"Failed to download model from HuggingFace: {e}\n"
@@ -125,7 +157,11 @@ class ActionPredictor:
                 )
 
             state_dict = load_file(model_path)
-            config = {}  # SafeTensors doesn't store config
+            # SafeTensors holds no config; use a sibling config.json if present
+            # (the Hugging Face model folders ship one).
+            config = self._read_sibling_config(model_path)
+            if config.get("class_names"):
+                self._checkpoint = {"class_names": config["class_names"]}
 
         else:
             # Load PyTorch checkpoint - FIX: Add weights_only=False for compatibility
@@ -135,15 +171,24 @@ class ActionPredictor:
 
             # Extract state dict and config
             if isinstance(checkpoint, dict):
+                self._checkpoint = {"class_names": checkpoint.get("class_names")}
                 state_dict = checkpoint.get("model_state_dict", checkpoint)
                 config = checkpoint.get("config", {})
             else:
                 state_dict = checkpoint
                 config = {}
 
-        # Get model parameters
-        model_name = config.get("model_name", "resnet34")
-        num_classes = config.get("num_classes", 40)
+        # Architecture: checkpoint config > constructor arguments > defaults
+        model_name = config.get("model_name") or self._fallback_model_name
+        num_classes = config.get("num_classes") or self._fallback_num_classes
+        if model_name is None:
+            model_name = "resnet34"
+            print(
+                "Warning: weights carry no architecture info; assuming "
+                f"'{model_name}'. Pass model_name=... (CLI: --model_name) if wrong."
+            )
+        if num_classes is None:
+            num_classes = 40
 
         # Create model
         from hac.image.models.classifier import create_model
@@ -156,7 +201,15 @@ class ActionPredictor:
         )
 
         # Load weights
-        model.load_state_dict(state_dict)
+        try:
+            model.load_state_dict(state_dict)
+        except RuntimeError as e:
+            raise RuntimeError(
+                f"Weights at {model_path} do not match a '{model_name}' model with "
+                f"{num_classes} classes. If the file has no embedded config (e.g. "
+                "a .safetensors export), pass the correct model_name/num_classes "
+                "(CLI: --model_name / --num_classes)."
+            ) from e
         model = model.to(self.device)
         model.eval()
 
@@ -164,50 +217,21 @@ class ActionPredictor:
 
         return model
 
-    def _get_default_class_names(self) -> List[str]:
-        """Get Stanford 40 action class names."""
-        return [
-            "applauding",
-            "blowing_bubbles",
-            "brushing_teeth",
-            "cleaning_the_floor",
-            "climbing",
-            "cooking",
-            "cutting_trees",
-            "cutting_vegetables",
-            "drinking",
-            "feeding_a_horse",
-            "fishing",
-            "fixing_a_bike",
-            "fixing_a_car",
-            "gardening",
-            "holding_an_umbrella",
-            "jumping",
-            "looking_through_a_microscope",
-            "looking_through_a_telescope",
-            "playing_guitar",
-            "playing_violin",
-            "pouring_liquid",
-            "pushing_a_cart",
-            "reading",
-            "phoning",
-            "riding_a_bike",
-            "riding_a_horse",
-            "rowing_a_boat",
-            "running",
-            "shooting_an_arrow",
-            "smoking",
-            "taking_photos",
-            "texting_message",
-            "throwing_frisby",
-            "using_a_computer",
-            "walking_the_dog",
-            "washing_dishes",
-            "watching_TV",
-            "waving_hands",
-            "writing_on_a_board",
-            "writing_on_a_book",
-        ]
+    @staticmethod
+    def _read_sibling_config(model_path: str) -> Dict:
+        """Load ``config.json`` next to a weights file, or {} if absent/invalid."""
+        config_path = Path(model_path).with_name("config.json")
+        if not config_path.is_file():
+            return {}
+        try:
+            with open(config_path) as f:
+                config = json.load(f)
+        except (OSError, ValueError):
+            return {}
+        if not isinstance(config, dict):
+            return {}
+        print(f"✓ Using architecture info from {config_path}")
+        return config
 
     @torch.no_grad()
     def predict_image(
@@ -225,9 +249,10 @@ class ActionPredictor:
         """
         # Load image if path
         if isinstance(image, str):
-            image = cv2.imread(image)
+            image_path = image
+            image = cv2.imread(image_path)
             if image is None:
-                raise ValueError(f"Could not load image: {image}")
+                raise ValueError(f"Could not load image: {image_path}")
 
         results = {}
 
@@ -308,6 +333,12 @@ class ActionPredictor:
             frame_count += 1
 
         cap.release()
+
+        if not frame_predictions:
+            raise ValueError(
+                f"No frames could be classified from {video_path} "
+                f"({frame_count} frames read)"
+            )
 
         # Aggregate predictions
         if aggregate_method == "voting":

@@ -1,30 +1,33 @@
-FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
+# CPU/GPU image for the Gradio image demo and CLI.
+# Build: docker build -t hac .
+# Run:   docker run --gpus all -p 7860:7860 -v $PWD/weights:/app/weights hac \
+#            hac-demo --model weights/best.pth
+FROM pytorch/pytorch:2.4.1-cuda12.1-cudnn9-runtime
 
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
+# OpenCV / MediaPipe runtime libraries
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libgl1 \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
-    libxrender-dev \
+    libxrender1 \
     libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements
-COPY pyproject.toml .
-
-# Install package
-RUN pip install --no-cache-dir -e ".[demo,train]"
-
-# Copy source code
+# Copy package metadata and sources before installing (README is referenced
+# by pyproject.toml, src/ is needed for the package itself)
+COPY pyproject.toml ./
+COPY .github/README.md .github/README.md
 COPY src/ src/
-COPY configs/ configs/
+COPY scripts/ scripts/
 COPY examples/ examples/
+COPY assets/ assets/
 
-# Expose ports for Gradio
+RUN pip install --no-cache-dir ".[demo]"
+
 EXPOSE 7860
 
-# Default command
-CMD ["hac-demo", "--port", "7860", "--share"]
+# Listens on 0.0.0.0:7860; add --share only if you want a public Gradio link
+CMD ["hac-demo", "--port", "7860"]

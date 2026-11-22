@@ -7,13 +7,25 @@ import torch
 from PIL import Image
 from torchvision import transforms
 
+from hac.common.class_names import (
+    HMDB51_CLASSES,
+    UCF101_CLASSES,
+    resolve_class_names,
+)
 from hac.video.models.classifier import Video3DCNN
 
 
 class VideoPredictor:
     """Predictor for video action recognition."""
 
-    def __init__(self, model_path, num_frames=16, spatial_size=112, device="cuda"):
+    def __init__(
+        self,
+        model_path,
+        num_frames=16,
+        spatial_size=112,
+        device="cuda",
+        class_names=None,
+    ):
         """Initialize video predictor.
 
         Args:
@@ -21,6 +33,7 @@ class VideoPredictor:
             num_frames: Number of frames to sample
             spatial_size: Spatial size for frames
             device: Device (cuda/cpu)
+            class_names: Optional class list overriding checkpoint/default names
         """
         self.num_frames = num_frames
         self.spatial_size = spatial_size
@@ -42,26 +55,29 @@ class VideoPredictor:
             ]
         )
 
-        # Class names: pick the list matching the checkpoint's own class count
-        # rather than assuming UCF-101, since this project also ships HMDB51
-        # checkpoints (a different 51-class label set) through the same class.
+        # Class names: explicit argument > names stored in the checkpoint >
+        # canonical list chosen by class count (UCF-101 / HMDB51).
         num_classes = self.model.num_classes
-        if num_classes == 101:
-            self.class_names = self._get_ucf101_classes()
-        elif num_classes == 51:
-            self.class_names = self._get_hmdb51_classes()
+        if class_names is not None:
+            if len(class_names) != num_classes:
+                raise ValueError(
+                    f"Got {len(class_names)} class names for a "
+                    f"{num_classes}-class model"
+                )
+            self.class_names = list(class_names)
         else:
-            print(
-                f"Warning: no known class names for {num_classes}-class checkpoint; "
-                "falling back to generic 'class_N' labels."
+            fallback = {101: UCF101_CLASSES, 51: HMDB51_CLASSES}.get(num_classes)
+            self.class_names = resolve_class_names(
+                self._checkpoint, num_classes, fallback
             )
-            self.class_names = [f"class_{i}" for i in range(num_classes)]
 
     def _load_model(self, model_path):
         """Load model from checkpoint."""
         checkpoint = torch.load(
             model_path, map_location=self.device, weights_only=False
         )
+        # Keep only the stored class names, not the full (optimizer-heavy) checkpoint
+        self._checkpoint = {"class_names": checkpoint.get("class_names")}
 
         # Get config
         config = checkpoint.get("config", {})
@@ -83,170 +99,6 @@ class VideoPredictor:
         print(f"✓ Loaded model: {model_name} ({num_classes} classes)")
 
         return model
-
-    def _get_ucf101_classes(self):
-        """Get UCF-101 class names."""
-        classes = [
-            "ApplyEyeMakeup",
-            "ApplyLipstick",
-            "Archery",
-            "BabyCrawling",
-            "BalanceBeam",
-            "BandMarching",
-            "BaseballPitch",
-            "Basketball",
-            "BasketballDunk",
-            "BenchPress",
-            "Biking",
-            "Billiards",
-            "BlowDryHair",
-            "BlowingCandles",
-            "BodyWeightSquats",
-            "Bowling",
-            "BoxingPunchingBag",
-            "BoxingSpeedBag",
-            "BreastStroke",
-            "BrushingTeeth",
-            "CleanAndJerk",
-            "CliffDiving",
-            "CricketBowling",
-            "CricketShot",
-            "CuttingInKitchen",
-            "Diving",
-            "Drumming",
-            "Fencing",
-            "FieldHockeyPenalty",
-            "FloorGymnastics",
-            "FrisbeeCatch",
-            "FrontCrawl",
-            "GolfSwing",
-            "Haircut",
-            "Hammering",
-            "HammerThrow",
-            "HandstandPushups",
-            "HandstandWalking",
-            "HeadMassage",
-            "HighJump",
-            "HorseRace",
-            "HorseRiding",
-            "HulaHoop",
-            "IceDancing",
-            "JavelinThrow",
-            "JugglingBalls",
-            "JumpingJack",
-            "JumpRope",
-            "Kayaking",
-            "Knitting",
-            "LongJump",
-            "Lunges",
-            "MilitaryParade",
-            "Mixing",
-            "MoppingFloor",
-            "Nunchucks",
-            "ParallelBars",
-            "PizzaTossing",
-            "PlayingCello",
-            "PlayingDaf",
-            "PlayingDhol",
-            "PlayingFlute",
-            "PlayingGuitar",
-            "PlayingPiano",
-            "PlayingSitar",
-            "PlayingTabla",
-            "PlayingViolin",
-            "PoleVault",
-            "PommelHorse",
-            "PullUps",
-            "Punch",
-            "PushUps",
-            "Rafting",
-            "RockClimbingIndoor",
-            "RopeClimbing",
-            "Rowing",
-            "SalsaSpin",
-            "ShavingBeard",
-            "Shotput",
-            "SkateBoarding",
-            "Skiing",
-            "Skijet",
-            "SkyDiving",
-            "SoccerJuggling",
-            "SoccerPenalty",
-            "StillRings",
-            "SumoWrestling",
-            "Surfing",
-            "Swing",
-            "TableTennisShot",
-            "TaiChi",
-            "TennisSwing",
-            "ThrowDiscus",
-            "TrampolineJumping",
-            "Typing",
-            "UnevenBars",
-            "VolleyballSpiking",
-            "WalkingWithDog",
-            "WallPushups",
-            "WritingOnBoard",
-            "YoYo",
-        ]
-        return classes
-
-    def _get_hmdb51_classes(self):
-        """Get HMDB51 class names (alphabetical, matching the dataset's own directory-
-        name ordering used by VideoDataset/SpatialDataset)."""
-        return [
-            "brush_hair",
-            "cartwheel",
-            "catch",
-            "chew",
-            "clap",
-            "climb",
-            "climb_stairs",
-            "dive",
-            "draw_sword",
-            "dribble",
-            "drink",
-            "eat",
-            "fall_floor",
-            "fencing",
-            "flic_flac",
-            "golf",
-            "handstand",
-            "hit",
-            "hug",
-            "jump",
-            "kick",
-            "kick_ball",
-            "kiss",
-            "laugh",
-            "pick",
-            "pour",
-            "pullup",
-            "punch",
-            "push",
-            "pushup",
-            "ride_bike",
-            "ride_horse",
-            "run",
-            "shake_hands",
-            "shoot_ball",
-            "shoot_bow",
-            "shoot_gun",
-            "sit",
-            "situp",
-            "smile",
-            "smoke",
-            "somersault",
-            "stand",
-            "swing_baseball",
-            "sword",
-            "sword_exercise",
-            "talk",
-            "throw",
-            "turn",
-            "walk",
-            "wave",
-        ]
 
     def _load_video(self, video_path):
         """Load video and extract frames."""
@@ -316,7 +168,7 @@ class VideoPredictor:
             probs = torch.softmax(outputs, dim=1)
 
         # Get top-k predictions
-        top_probs, top_indices = torch.topk(probs[0], top_k)
+        top_probs, top_indices = torch.topk(probs[0], min(top_k, probs.shape[1]))
 
         predictions = []
         for prob, idx in zip(top_probs, top_indices):
