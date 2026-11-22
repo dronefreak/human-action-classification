@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 import torch
 
+from hac.common.class_names import STANFORD40_CLASSES, resolve_class_names
 from hac.common.transforms import get_inference_transforms
 from hac.image.inference.pose_extractor import PoseClassifier, PoseExtractor
 from hac.image.models.classifier import ActionClassifier
@@ -44,7 +45,8 @@ class ActionPredictor:
             )
             self.pose_classifier = PoseClassifier()
 
-        # Load model
+        # Load model (keeps the raw checkpoint so stored class names can be used)
+        self._checkpoint = None
         if model_path:
             self.model = self._load_model(model_path)
         else:
@@ -57,11 +59,19 @@ class ActionPredictor:
         self.model = self.model.to(self.device)
         self.model.eval()
 
-        # Load or use default class names
+        # Class names: explicit argument > checkpoint > Stanford40 default
+        num_classes = self.model.num_classes
         if class_names:
-            self.class_names = class_names
+            if len(class_names) != num_classes:
+                raise ValueError(
+                    f"Got {len(class_names)} class names for a "
+                    f"{num_classes}-class model"
+                )
+            self.class_names = list(class_names)
         else:
-            self.class_names = self._get_default_class_names()
+            self.class_names = resolve_class_names(
+                self._checkpoint, num_classes, STANFORD40_CLASSES
+            )
 
         # Get transforms
         self.transform = get_inference_transforms()
@@ -135,6 +145,8 @@ class ActionPredictor:
 
             # Extract state dict and config
             if isinstance(checkpoint, dict):
+                self._checkpoint = {"class_names": checkpoint.get("class_names")}
+            if isinstance(checkpoint, dict):
                 state_dict = checkpoint.get("model_state_dict", checkpoint)
                 config = checkpoint.get("config", {})
             else:
@@ -163,51 +175,6 @@ class ActionPredictor:
         print(f"✓ Model loaded: {model_name} ({num_classes} classes)")
 
         return model
-
-    def _get_default_class_names(self) -> List[str]:
-        """Get Stanford 40 action class names."""
-        return [
-            "applauding",
-            "blowing_bubbles",
-            "brushing_teeth",
-            "cleaning_the_floor",
-            "climbing",
-            "cooking",
-            "cutting_trees",
-            "cutting_vegetables",
-            "drinking",
-            "feeding_a_horse",
-            "fishing",
-            "fixing_a_bike",
-            "fixing_a_car",
-            "gardening",
-            "holding_an_umbrella",
-            "jumping",
-            "looking_through_a_microscope",
-            "looking_through_a_telescope",
-            "playing_guitar",
-            "playing_violin",
-            "pouring_liquid",
-            "pushing_a_cart",
-            "reading",
-            "phoning",
-            "riding_a_bike",
-            "riding_a_horse",
-            "rowing_a_boat",
-            "running",
-            "shooting_an_arrow",
-            "smoking",
-            "taking_photos",
-            "texting_message",
-            "throwing_frisby",
-            "using_a_computer",
-            "walking_the_dog",
-            "washing_dishes",
-            "watching_TV",
-            "waving_hands",
-            "writing_on_a_board",
-            "writing_on_a_book",
-        ]
 
     @torch.no_grad()
     def predict_image(
