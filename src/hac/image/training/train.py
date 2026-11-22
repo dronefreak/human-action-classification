@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import sys
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -557,8 +558,9 @@ def main():
 
         subprocess.run(
             [
-                "python",
-                "src/hac/image/inference/evaluate.py",
+                sys.executable,
+                "-m",
+                "hac.image.inference.evaluate",
                 "--checkpoint",
                 f"{args.output_dir}/best.pth",
                 "--split",

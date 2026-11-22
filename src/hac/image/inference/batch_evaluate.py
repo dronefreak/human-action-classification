@@ -7,6 +7,7 @@ Creates a comparison table of all models.
 import argparse
 import json
 import subprocess
+import sys
 from pathlib import Path
 from typing import Dict, List
 
@@ -18,8 +19,9 @@ def run_evaluation(
 ):
     """Run evaluation script for a single model."""
     cmd = [
-        "python",
-        "src/hac/image/inference/evaluate.py",
+        sys.executable,
+        "-m",
+        "hac.image.inference.evaluate",
         "--checkpoint",
         checkpoint,
         "--data_dir",

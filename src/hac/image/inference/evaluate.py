@@ -18,25 +18,37 @@ import yaml
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 
+from hac.common.class_names import STANFORD40_CLASSES
 from hac.common.transforms import get_inference_transforms
 from hac.image.data.dataset import ActionDataset
 from hac.image.models.classifier import create_model
 
 
-def load_model_from_checkpoint(checkpoint_path: str, device: str = "cuda"):
-    """Load model from checkpoint and extract config."""
+def load_model_from_checkpoint(
+    checkpoint_path: str,
+    device: str = "cuda",
+    model_name: str = None,
+    num_classes: int = None,
+):
+    """Load model from checkpoint and extract config.
+
+    ``model_name`` / ``num_classes`` override the checkpoint config (needed for
+    checkpoints saved without one).
+    """
     print(f"Loading checkpoint: {checkpoint_path}")
     checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
 
     # Extract config
-    config = checkpoint.get("config", {})
-    if not config:
-        # Fallback to defaults if no config
-        print("Warning: No config found in checkpoint, using defaults")
-        config = {
-            "model_name": "resnet34",  # You'll need to specify this
-            "num_classes": 40,
-        }
+    config = dict(checkpoint.get("config", {}) or {})
+    if model_name:
+        config["model_name"] = model_name
+    if num_classes:
+        config["num_classes"] = num_classes
+    if "model_name" not in config:
+        print(
+            "Warning: No model_name in checkpoint config; assuming resnet34 "
+            "(pass --model_name to override)"
+        )
 
     # Create model
     model = create_model(
@@ -54,6 +66,34 @@ def load_model_from_checkpoint(checkpoint_path: str, device: str = "cuda"):
     print(f"✓ Model loaded: {config.get('model_name', 'unknown')}")
 
     return model, config, checkpoint
+
+
+def _resolve_eval_class_names(checkpoint: Dict, config: Dict, split_dir: Path):
+    """Class list in the model's training index order.
+
+    Order of preference: names stored in the checkpoint; the split's own sorted
+    directories if their count matches the model; the Stanford40 list for
+    40-class models trained before class names were stored in checkpoints.
+    """
+    stored = checkpoint.get("class_names")
+    if stored:
+        return list(stored)
+
+    num_classes = config.get("num_classes", 40)
+    split_dirs = sorted(d.name for d in split_dir.iterdir() if d.is_dir())
+    if len(split_dirs) == num_classes:
+        return split_dirs
+    if num_classes == len(STANFORD40_CLASSES):
+        print(
+            f"Note: {split_dir} has {len(split_dirs)} class dirs; using the "
+            "Stanford40 class list so labels match the model's indices."
+        )
+        return list(STANFORD40_CLASSES)
+    raise ValueError(
+        f"Checkpoint stores no class names and {split_dir} has "
+        f"{len(split_dirs)} class directories for a {num_classes}-class model; "
+        "cannot align labels. Re-save the checkpoint with 'class_names'."
+    )
 
 
 @torch.no_grad()
@@ -448,22 +488,24 @@ Examples:
     print("=" * 60)
 
     # Load model
-    model, config, checkpoint = load_model_from_checkpoint(args.checkpoint, args.device)
-
-    # Override config if specified
-    if args.model_name:
-        config["model_name"] = args.model_name
-    if args.num_classes:
-        config["num_classes"] = args.num_classes
+    model, config, checkpoint = load_model_from_checkpoint(
+        args.checkpoint,
+        args.device,
+        model_name=args.model_name,
+        num_classes=args.num_classes,
+    )
 
     # Load dataset
     print(f"\nLoading {args.split} dataset...")
-    # Use the checkpoint's class list (if stored) so indices match training
+    # Class list must match the training index order, not just this split's dirs
+    class_names = _resolve_eval_class_names(
+        checkpoint, config, Path(args.data_dir) / args.split
+    )
     dataset = ActionDataset(
         root_dir=args.data_dir,
         split=args.split,
         transform=get_inference_transforms(),
-        class_names=checkpoint.get("class_names"),
+        class_names=class_names,
     )
 
     dataloader = DataLoader(
