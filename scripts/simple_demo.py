@@ -12,7 +12,7 @@ import cv2
 import numpy as np
 import torch
 
-from hac import ActionPredictor
+from hac.image.inference.predictor import ActionPredictor
 
 
 def draw_keypoints_skeleton(

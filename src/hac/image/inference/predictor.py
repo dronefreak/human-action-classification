@@ -25,6 +25,8 @@ class ActionPredictor:
         device: str = "cuda" if torch.cuda.is_available() else "cpu",
         use_pose_estimation: bool = True,
         pose_model_path: Optional[str] = None,
+        model_name: Optional[str] = None,
+        num_classes: Optional[int] = None,
     ):
         """Initialize predictor.
 
@@ -34,8 +36,14 @@ class ActionPredictor:
             device: "cuda" or "cpu"
             use_pose_estimation: Whether to use MediaPipe pose estimation
             pose_model_path: Optional separate model for pose classification
+            model_name: timm architecture, used when the weights carry no config
+                (e.g. ``.safetensors`` files). Defaults to ``resnet34``.
+            num_classes: Class count, used when the weights carry no config.
+                Defaults to 40 (Stanford40).
         """
         self.device = torch.device(device)
+        self._fallback_model_name = model_name
+        self._fallback_num_classes = num_classes
         self.use_pose_estimation = use_pose_estimation
 
         # Initialize pose extractor if needed
@@ -146,16 +154,23 @@ class ActionPredictor:
             # Extract state dict and config
             if isinstance(checkpoint, dict):
                 self._checkpoint = {"class_names": checkpoint.get("class_names")}
-            if isinstance(checkpoint, dict):
                 state_dict = checkpoint.get("model_state_dict", checkpoint)
                 config = checkpoint.get("config", {})
             else:
                 state_dict = checkpoint
                 config = {}
 
-        # Get model parameters
-        model_name = config.get("model_name", "resnet34")
-        num_classes = config.get("num_classes", 40)
+        # Architecture: checkpoint config > constructor arguments > defaults
+        model_name = config.get("model_name") or self._fallback_model_name
+        num_classes = config.get("num_classes") or self._fallback_num_classes
+        if model_name is None:
+            model_name = "resnet34"
+            print(
+                "Warning: weights carry no architecture info; assuming "
+                f"'{model_name}'. Pass model_name=... (CLI: --model_name) if wrong."
+            )
+        if num_classes is None:
+            num_classes = 40
 
         # Create model
         from hac.image.models.classifier import create_model
@@ -168,7 +183,15 @@ class ActionPredictor:
         )
 
         # Load weights
-        model.load_state_dict(state_dict)
+        try:
+            model.load_state_dict(state_dict)
+        except RuntimeError as e:
+            raise RuntimeError(
+                f"Weights at {model_path} do not match a '{model_name}' model with "
+                f"{num_classes} classes. If the file has no embedded config (e.g. "
+                "a .safetensors export), pass the correct model_name/num_classes "
+                "(CLI: --model_name / --num_classes)."
+            ) from e
         model = model.to(self.device)
         model.eval()
 
@@ -192,9 +215,10 @@ class ActionPredictor:
         """
         # Load image if path
         if isinstance(image, str):
-            image = cv2.imread(image)
+            image_path = image
+            image = cv2.imread(image_path)
             if image is None:
-                raise ValueError(f"Could not load image: {image}")
+                raise ValueError(f"Could not load image: {image_path}")
 
         results = {}
 
@@ -275,6 +299,12 @@ class ActionPredictor:
             frame_count += 1
 
         cap.release()
+
+        if not frame_predictions:
+            raise ValueError(
+                f"No frames could be classified from {video_path} "
+                f"({frame_count} frames read)"
+            )
 
         # Aggregate predictions
         if aggregate_method == "voting":

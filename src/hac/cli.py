@@ -3,7 +3,29 @@
 import argparse
 import sys
 
+import cv2
+import torch
+
 from hac.image.inference.predictor import ActionPredictor
+
+DEFAULT_DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+
+
+def _add_image_model_args(parser):
+    """Architecture hints for image weights that carry no config (.safetensors)."""
+    parser.add_argument(
+        "--model_name",
+        type=str,
+        default=None,
+        help="timm architecture if the weights have no embedded config "
+        "(e.g. resnet50 for a .safetensors file)",
+    )
+    parser.add_argument(
+        "--num_classes",
+        type=int,
+        default=None,
+        help="Number of classes if the weights have no embedded config",
+    )
 
 
 def infer():
@@ -28,7 +50,9 @@ def infer():
     parser.add_argument("--video", type=str, help="Path to input video")
     parser.add_argument("--webcam", action="store_true", help="Use webcam")
     parser.add_argument("--model", type=str, help="Path to trained model")
-    parser.add_argument("--device", type=str, default="cuda", help="Device (cuda/cpu)")
+    parser.add_argument(
+        "--device", type=str, default=DEFAULT_DEVICE, help="Device (cuda/cpu)"
+    )
     parser.add_argument(
         "--top_k", type=int, default=5, help="Number of top predictions"
     )
@@ -39,6 +63,7 @@ def infer():
         help="Frames sampled per clip (video only; use 8 for the "
         "Kinetics-400-initialized HMDB51 model, 16 for the UCF-101 models)",
     )
+    _add_image_model_args(parser)
 
     args = parser.parse_args()
 
@@ -69,7 +94,11 @@ def infer():
     # --image / --webcam use the pose-aware image pipeline
     print(f"Loading model from: {args.model}")
     predictor = ActionPredictor(
-        model_path=args.model, device=args.device, use_pose_estimation=True
+        model_path=args.model,
+        device=args.device,
+        use_pose_estimation=True,
+        model_name=args.model_name,
+        num_classes=args.num_classes,
     )
 
     if args.image:
@@ -92,9 +121,9 @@ def infer():
 
 def train():
     """CLI for training."""
-    print("Training CLI")
-    print("Please use: python -m hac.training.train --help")
-    print("Or import and use the Trainer class directly")
+    print("Training is run through the module entry points:")
+    print("  Image (e.g. Stanford40): python -m hac.image.training.train --help")
+    print("  Video (e.g. UCF-101):    python -m hac.video.training.train --help")
 
 
 def demo():
@@ -110,17 +139,28 @@ def demo():
     parser.add_argument("--model", type=str, help="Path to trained model")
     parser.add_argument("--port", type=int, default=7860, help="Port to run on")
     parser.add_argument("--share", action="store_true", help="Create public link")
+    parser.add_argument(
+        "--device", type=str, default=DEFAULT_DEVICE, help="Device (cuda/cpu)"
+    )
+    _add_image_model_args(parser)
 
     args = parser.parse_args()
 
     # Initialize predictor
     predictor = ActionPredictor(
-        model_path=args.model, device="cuda", use_pose_estimation=True
+        model_path=args.model,
+        device=args.device,
+        use_pose_estimation=True,
+        model_name=args.model_name,
+        num_classes=args.num_classes,
     )
 
     def predict_interface(image):
-        """Gradio interface function."""
-        result = predictor.predict_image(image, return_pose=True, top_k=5)
+        """Gradio interface function (Gradio supplies RGB; predictor wants BGR)."""
+        if image is None:
+            return None, "Please upload an image."
+        image_bgr = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        result = predictor.predict_image(image_bgr, return_pose=True, top_k=5)
 
         # Format output
         output_text = ""
@@ -132,8 +172,11 @@ def demo():
         for i, pred in enumerate(result["action"]["predictions"], 1):
             output_text += f"{i}. {pred['class']}: {pred['confidence']:.3f}\n"
 
-        # Return annotated image and text
-        output_image = result.get("pose_image", image)
+        # Return annotated image (back to RGB for display) and text
+        if "pose_image" in result:
+            output_image = cv2.cvtColor(result["pose_image"], cv2.COLOR_BGR2RGB)
+        else:
+            output_image = image
 
         return output_image, output_text
 
@@ -154,7 +197,7 @@ def demo():
     )
 
     print(f"\nLaunching demo on port {args.port}")
-    print("Local URL: http://localhost:{args.port}")
+    print(f"Local URL: http://localhost:{args.port}")
 
     interface.launch(server_port=args.port, share=args.share, server_name="0.0.0.0")
 

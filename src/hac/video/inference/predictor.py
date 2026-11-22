@@ -168,7 +168,7 @@ class VideoPredictor:
             probs = torch.softmax(outputs, dim=1)
 
         # Get top-k predictions
-        top_probs, top_indices = torch.topk(probs[0], top_k)
+        top_probs, top_indices = torch.topk(probs[0], min(top_k, probs.shape[1]))
 
         predictions = []
         for prob, idx in zip(top_probs, top_indices):
