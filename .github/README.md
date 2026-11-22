@@ -1,6 +1,6 @@
 # Human Action Classification 🎬
 
-[![Python 3.9+](https://img.shields.io/badge/Python-3.9+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](https://www.python.org/)
 [![PyTorch 2.0+](https://img.shields.io/badge/PyTorch-2.0+-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org/)
 [![HuggingFace](https://img.shields.io/badge/🤗%20Models-5%20Published-FFD21E)](https://huggingface.co/dronefreak)
 [![License](https://img.shields.io/badge/License-Apache%202.0-green)](../LICENSE)

@@ -6,6 +6,7 @@ Creates a professional visualization with video clips and predictions.
 
 import argparse
 from pathlib import Path
+from typing import Union
 
 import cv2
 import numpy as np
@@ -316,7 +317,7 @@ class DemoGIFCreator:
         return np.array(frame_pil)
 
 
-def collect_videos(video_dir: str | Path, exts=("mp4", "avi")):
+def collect_videos(video_dir: Union[str, Path], exts=("mp4", "avi")):
     video_dir = Path(video_dir)
     if not video_dir.exists():
         raise ValueError(f"Directory does not exist: {video_dir}")
