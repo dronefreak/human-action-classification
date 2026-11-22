@@ -1,258 +1,74 @@
-# Contributing to Human Action Classification v2.0
+# Contributing
 
-First off - thanks for considering contributing! This repo went from 233 stars on TF 1.13 code to a modern PyTorch rewrite, and your contributions can keep it relevant.
+Thanks for considering a contribution! Bug fixes, tests, documentation, new architectures and deployment guides are all welcome.
 
-## Quick Links
-
-- [Code of Conduct](#code-of-conduct)
-- [How Can I Contribute?](#how-can-i-contribute)
-- [Development Setup](#development-setup)
-- [Pull Request Process](#pull-request-process)
-- [Style Guide](#style-guide)
-
-## Code of Conduct
-
-**Be cool. Don't be a jerk.** That's it.
-
-## How Can I Contribute?
-
-### 1. Pre-trained Weights (HIGH PRIORITY)
-
-The repo currently has no pre-trained weights on Stanford 40. This is the #1 contribution opportunity:
+## Development setup
 
 ```bash
-# Train on Stanford 40
-python -m hac.training.train \
-    --data_dir stanford40/ \
-    --model_name mobilenetv3_small_100 \
-    --epochs 50
-
-# Upload to HuggingFace Hub
-# Submit PR with download link
-```
-
-### 2. Dataset Integration
-
-Add loaders for other action recognition datasets:
-
-- NTU RGB+D
-- Kinetics-400/700
-- UCF-101
-- HMDB-51
-- AVA (for AV applications)
-
-### 3. Temporal Models
-
-Current implementation is single-frame. Add:
-
-- SlowFast networks
-- X3D models
-- Video transformers (VideoMAE, TimeSformer)
-- LSTM/GRU on pose sequences
-
-### 4. Edge Optimization
-
-- ONNX export scripts
-- TensorRT optimization
-- Quantization (INT8)
-- Mobile deployment (CoreML, TFLite)
-- Benchmark on Jetson/Pi
-
-### 5. Documentation
-
-- More example notebooks
-- Video tutorials
-- API documentation (Sphinx)
-- Performance benchmarks
-
-### 6. Testing
-
-We're at like 10% test coverage. Help us get to 80%:
-
-- Unit tests
-- Integration tests
-- Benchmark tests
-- Edge case handling
-
-## Development Setup
-
-```bash
-# Clone repo
 git clone https://github.com/dronefreak/human-action-classification.git
 cd human-action-classification
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # or `venv\Scripts\activate` on Windows
-
-# Install in dev mode
-pip install -e ".[dev,demo,train]"
-
-# Install pre-commit hooks (optional)
-pip install pre-commit
-pre-commit install
+python -m venv .venv && source .venv/bin/activate   # Python 3.10-3.12
+pip install -e ".[dev,demo]"
+pre-commit install   # optional: runs black/isort/flake8 on commit
 ```
 
-## Project Structure
+> MediaPipe is pinned below 0.10.30, which removed the `mp.solutions` pose API the image pipeline uses.
+
+## Project layout
 
 ```
 src/hac/
-├── models/          # Add new architectures here
-├── inference/       # Inference pipeline
-├── data/           # Dataset loaders
-├── training/       # Training utilities
-└── utils/          # Helper functions
-
-tests/              # Add tests here
-examples/           # Add notebooks here
-scripts/            # Utility scripts
-configs/            # Hydra configs (coming soon)
+├── common/      # shared: class-name lists, metrics, transforms, safetensors conversion
+├── image/       # single-frame pipeline (Stanford40): data, models (timm), training, inference
+├── video/       # clip pipeline (UCF-101/HMDB51): data + UCF-101 prep, 3D-CNN models, training, inference
+└── cli.py       # hac-infer / hac-train / hac-demo entry points
+tests/           # CPU-only pytest suite on synthetic data (no downloads)
+scripts/         # standalone demos
+examples/        # notebooks
 ```
 
-## Pull Request Process
+Training entry points: `python -m hac.image.training.train --help` and `python -m hac.video.training.train --help`.
 
-1. **Fork the repo** and create your branch from `main`
-
-   ```bash
-   git checkout -b feature/awesome-feature
-   ```
-
-2. **Make your changes**
-   - Write clean, readable code
-   - Add docstrings
-   - Update README if needed
-
-3. **Test your changes**
-
-   ```bash
-   # Run tests
-   pytest tests/ -v
-
-   # Check formatting
-   black src/
-   isort src/
-
-   # Type checking
-   mypy src/ --ignore-missing-imports
-   ```
-
-4. **Commit with clear messages**
-
-   ```bash
-   git commit -m "Add SlowFast model for temporal action recognition"
-   ```
-
-5. **Push and create PR**
-
-   ```bash
-   git push origin feature/awesome-feature
-   ```
-
-6. **Fill out PR template** with:
-   - What you changed
-   - Why you changed it
-   - How to test it
-   - Screenshots/benchmarks if applicable
-
-## Style Guide
-
-### Python Style
-
-We mostly follow [Black](https://black.readthedocs.io/) with:
-
-- Line length: 100
-- Type hints where appropriate
-- Docstrings for public functions
-
-```python
-def predict_action(
-    image: np.ndarray,
-    model: nn.Module,
-    device: str = "cuda"
-) -> Dict[str, Any]:
-    """
-    Predict action from image.
-
-    Args:
-        image: Input image in BGR format
-        model: PyTorch model
-        device: Device to run inference on
-
-    Returns:
-        Dictionary with predictions
-    """
-    # Implementation
-    pass
-```
-
-### Commit Messages
-
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
+## Before opening a PR
 
 ```bash
-feat: add SlowFast model support
-fix: correct pose classification threshold
-docs: update installation instructions
-test: add unit tests for pose extractor
-perf: optimize MediaPipe inference
-refactor: simplify training loop
+pytest tests/                    # all tests must pass (CPU, ~15 s)
+black src/ tests/                # formatting, line length 88
+isort src/ tests/                # import order (black profile)
+flake8 src/ tests/               # lint
 ```
 
-### Documentation
+CI runs the same checks on Python 3.10, 3.11 and 3.12 for every PR to `master`/`dev`.
 
-- **Docstrings**: Google style
-- **README**: Keep it concise, move details to docs/
-- **Comments**: Explain WHY, not WHAT
+Please also:
 
-## What We're Looking For
+- add or update tests for behaviour you change (keep them CPU-only and download-free);
+- keep checkpoints self-describing: trainers store `config` and `class_names`, and predictors rely on them;
+- never reorder the lists in `hac/common/class_names.py`; index order must match the sorted class directories the released models were trained on;
+- update the README if user-facing behaviour changes.
 
-### High Priority
+## Pull requests
 
-- Pre-trained weights on Stanford 40
-- Temporal models (SlowFast, X3D)
-- ONNX/TensorRT export
-- More comprehensive tests
+1. Branch from `master`: `git checkout -b fix/short-description`.
+2. Keep PRs focused; open an issue first for large changes or new dependencies.
+3. Use [Conventional Commits](https://www.conventionalcommits.org/) messages, e.g. `fix: correct UCF-101 class order`, `feat: add X3D backbone`, `docs: clarify HMDB51 setup`, `test: cover video predictor`.
+4. In the PR description, say what changed, why, and how it was tested (include metrics for model changes).
 
-### Medium Priority
+## Style
 
-- Additional dataset loaders
-- Hydra config integration
-- Training on more datasets
-- Pedestrian prediction for AVs
+- Black formatting (88 columns), isort with the black profile.
+- Type hints and Google-style docstrings on public functions.
+- Comments explain _why_, not _what_.
 
-### Nice to Have
+## Where help is most useful
 
-- Web UI improvements
-- More example notebooks
-- Performance optimizations
-- Edge deployment examples
+- Additional backbones or datasets for the video pipeline (e.g. X3D, Kinetics).
+- Export and deployment (ONNX, TensorRT, quantization) with benchmarks.
+- Reproducing and reporting results on other splits (UCF-101 splits 2/3, HMDB51).
+- Documentation and example notebooks.
 
-## What We're NOT Looking For
+## Questions and bugs
 
-- Breaking changes without discussion
-- Dependencies on deprecated packages
-- Code without tests
-- PRs that don't follow style guide
+Open a [GitHub issue](https://github.com/dronefreak/human-action-classification/issues). For security problems, follow [SECURITY.md](SECURITY.md) instead of filing a public issue.
 
-## Getting Help
-
-- **Questions**: Open a Discussion
-- **Bugs**: Open an Issue
-- **Features**: Open an Issue to discuss first
-
-## Recognition
-
-Contributors get:
-
-- Listed in README
-- Shoutout in releases
-- Good karma
-- Street cred in the CV community
-
-## License
-
-By contributing, you agree that your contributions will be licensed under the Apache License.
-
----
-
-Thanks for making this repo better! 🚀
+By contributing, you agree that your contributions are licensed under the [Apache License 2.0](../LICENSE).
