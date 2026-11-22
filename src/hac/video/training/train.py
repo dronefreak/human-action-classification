@@ -15,7 +15,7 @@ from tqdm import tqdm
 from hac.common.metrics import compute_metrics
 from hac.video.data.augmentations import VideoAugmentation, mixup_criterion
 from hac.video.data.dataset import VideoDataset
-from hac.video.models.classifier import Video3DCNN
+from hac.video.models.classifier import MODEL_REGISTRY, Video3DCNN
 
 torch.backends.cudnn.benchmark = True  # Auto-tune kernels
 torch.backends.cuda.matmul.allow_tf32 = True
@@ -271,16 +271,7 @@ def main():
         "--model",
         type=str,
         default="r3d_18",
-        choices=[
-            "r3d_18",
-            "mc3_18",
-            "r2plus1d_18",
-            "mvit_v1_s",
-            "mvit_v1_b",
-            "swin3d_t",
-            "swin3d_s",
-            "swin3d_b",
-        ],
+        choices=sorted(MODEL_REGISTRY),
         help="3D CNN model",
     )
     parser.add_argument(

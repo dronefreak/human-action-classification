@@ -171,7 +171,7 @@ def process_ucf101(
     # Print summary
     print(f"\n{'='*60}")
     print("Processing Complete!")
-    print("{'='*60}")
+    print(f"{'='*60}")
     print(f"Total videos: {stats['total_videos']}")
     print(f"Successfully processed: {stats['processed']}")
     print(f"Failed: {stats['failed']}")
